@@ -11,6 +11,100 @@ from __future__ import division
 import math
 import numpy as np
 
+class ConcentrationValueCalculator(object):
+
+    """
+    Calculates odour concentration values at points in simulation region from
+    puff property arrays.
+    """
+    
+    def __init__(self, puff_molecular_amount):
+        """
+        Parameters
+        ----------
+        puff_mol_amount : float
+            Molecular content of each puff (e.g. in moles or raw number of
+            molecules). This is conserved as the puff is transported within
+            the plume but the puff becomes increasingly diffuse as it's radius
+            grows due to diffusion.
+        """
+        # precompute constant used to scale Gaussian amplitude
+        self.__ampl_const = puff_molecular_amount / (8*np.pi**3)**0.5
+    def __puff_conc_dist(self, x, y, z, px, py, pz, r_sq):
+        # calculate Gaussian puff concentration distribution
+        return self.__ampl_const / r_sq**1.5 * \
+                    np.exp(- ((x-px)**2 + (y-py)**2 + (z-pz)**2) / (2*r_sq) )
+
+    def calc_conc_point(self, puff_array, x, y, z=0):
+        """ 
+        Calculate concentration at a single point.
+        
+        Parameters
+        ----------
+        puff_array : numpy-array-like of Puff objects
+            Collection of currently alive puff instances at a particular
+            time step which it is desired to calculate concentration field
+            values from.
+        x : float
+            x-coordinate of point.
+        y : float
+            y-coordinate of point.
+        z : float
+            z-coordinate of point.
+        """
+        # filter for non-nan puff entries and separate properties for
+        # convenience
+        px, py, pz, r_sq = puff_array[~np.isnan(puff_array[:,0]),:].T
+        return self.__puff_conc_dist(x, y, z, px, py, pz, r_sq).sum(-1)
+    def calc_conc_list(self, puff_array, x, y, z=0):
+        """ 
+        Calculate concentrations across a 1D list of points in a xy-plane.
+        
+        Parameters
+        ----------
+        puff_array : numpy-array-like of Puff objects
+            Collection of currently alive puff instances at a particular
+            time step which it is desired to calculate concentration field
+            values from.
+        x : (np) numpy-array-like of floats
+            1D array of x-coordinates of points.
+        y : (np) numpy-array-like of floats
+            1D array of y-coordinates of points.
+        z : float
+            z-coordinate (height) of plane.
+        """
+        # filter for non-nan puff entries and separate properties for
+        # convenience
+        px, py, pz, r_sq = puff_array[~np.isnan(puff_array[:,0]),:].T
+        na = np.newaxis
+        return (self.__puff_conc_dist(x[:,na], y[:,na], z, px[na,:],
+                                     py[na,:], pz[na,:], r_sq[na,:])
+               ).sum(-1)
+    def calc_conc_grid(self, puff_array, x, y, z=0):
+        """ 
+        Calculate concentrations across a 2D grid of points in a xy-plane.
+        
+        Parameters
+        ----------
+        puff_array : numpy-array-like of Puff objects
+            Collection of currently alive puff instances at a particular
+            time step which it is desired to calculate concentration field
+            values from.
+        x : (nx,ny) numpy-array-like of floats
+            2D array of x-coordinates of grid points.
+        y : (nx,ny) numpy-array-like of floats
+            2D array of y-coordinates of grid points.
+        z : float
+            z-coordinate (height) of grid plane.
+        """
+        # filter for non-nan puff entries and separate properties for
+        # convenience
+        px, py, pz, r_sq = puff_array[~np.isnan(puff_array[:,0]),:].T
+        na = np.newaxis
+        return (self.__puff_conc_dist(x[:,:,na], y[:,:,na], z, px[na,na,:],
+                                     py[na,na,:], pz[na,na,:], r_sq[na,na,:])
+               ).sum(-1)
+
 class ConcentrationArrayGenerator(object):
     
     """
@@ -20,6 +114,12 @@ class ConcentrationArrayGenerator(object):
     properties outputted from a PlumeModel and process them to produce an
     array of the concentration values across the a specified region using
     a Gaussian model for the individual puff concentration distributions.
+    
+    Compared to the ConcentrationValueCalculator class, this class should be
+    more efficient for calculating large concentration field arrays for
+    real-time graphical display of odour concentration fields for example
+    at the expense of (very) slightly less accurate values due to the
+    truncation of spatial extent of each puff.
     
     Notes
     -----
@@ -197,60 +297,3 @@ class ConcentrationArrayGenerator(object):
         for puff_array in puff_arrays:
             conc_arrays.append(self.generate_single_frame(puff_array))
         return conc_arrays
-
-#class ConcentrationPointValueCalculator(object):
-#    def __init__(self, puff_molecular_amount):
-#        # precompute constant used to scale Gaussian amplitude
-#        self.__ampl_const = puff_molecular_amount / (8*np.pi**3)**0.5
-#    def calc_conc(self, puff_array, x, y, z=0):
-#        conc = 0
-#        for (px, py, pz, r_sq) in puff_array:
-#            # to begin with check this a real puff and not a placeholder nan
-#            # entry as puff arrays may have been pre-allocated with nan
-#            # at a fixed size for efficiency and as the number of puffs
-#            # existing at any time interval is variable some entries in the
-#            # array will be unallocated, placeholder entries should be
-#            # contiguous (i.e. all entries after the first placeholder will 
-#            # also be placeholders) therefore break out of loop completely
-#            # if one is encountered
-#            if np.isnan(px):
-#                break
-#            conc += self.__ampl_const/(r_sq)**1.5 * \
-#                    np.exp(-((x-px)**2 + (y-py)**2 + (z-pz)**2) / (2*r_sq))
-#        return conc
-        
-class ConcentrationValueCalculator(object):
-    def __init__(self, puff_molecular_amount):
-        # precompute constant used to scale Gaussian amplitude
-        self.__ampl_const = puff_molecular_amount / (8*np.pi**3)**0.5
-    def __puff_conc_dist(self, x, y, z, px, py, pz, r_sq):
-        # calculate Gaussian puff concentration distribution
-        return self.__ampl_const / r_sq**1.5 * \
-                    np.exp(- ((x-px)**2 + (y-py)**2 + (z-pz)**2) / (2*r_sq) )
-
-    def calc_conc_point(self, puff_array, x, y, z=0):
-        # filter for none nan puff entries and separate properties for
-        # convenience
-        px, py, pz, r_sq = puff_array[~np.isnan(puff_array[:,0]),:].T
-        return self.__puff_conc_dist(x, y, z, px, py, pz, r_sq).sum(-1)
-    def calc_conc_list(self, puff_array, x, y, z=0):
-        # filter for none nan puff entries and separate properties for
-        # convenience
-        px, py, pz, r_sq = puff_array[~np.isnan(puff_array[:,0]),:].T
-        na = np.newaxis
-        return (self.__puff_conc_dist(x[:,na], y[:,na], z, px[na,:],
-                                     py[na,:], pz[na,:], r_sq[na,:])
-               ).sum(-1)
-    def calc_conc_grid(self, puff_array, x, y, z=0):
-        # filter for none nan puff entries and separate properties for
-        # convenience
-        px, py, pz, r_sq = puff_array[~np.isnan(puff_array[:,0]),:].T
-        na = np.newaxis
-        return (self.__puff_conc_dist(x[:,:,na], y[:,:,na], z, px[na,na,:],
-                                     py[na,na,:], pz[na,na,:], r_sq[na,na,:])
-               ).sum(-1)
-        #concs = self.__ampl_const / r_sq[na,na,:]**1.5 * \
-        #            np.exp(-( (x[:,:,na] - px[na,na,:])**2 + 
-        #                      (y[:,:,na] - py[na,na,:])**2 + 
-        #                      (z - pz[na,na,:])**2 ) / (2*r_sq[na,na,:]) )
-        #return concs.sum(-1)

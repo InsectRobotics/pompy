@@ -3,7 +3,7 @@
 Demonstrations of how to set up models with graphical displays produced using
 matplotlib functions.
 
-@author: matt
+@author: Matthew Graham
 """
 
 import sys

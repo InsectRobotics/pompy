@@ -116,7 +116,7 @@ class Rectangle(object):
     
     @property
     def h(self):
-        """Width of rectangle (i.e. distance covered on x-axis)."""
+        """Height of rectangle (i.e. distance covered on y-axis)."""
         return self.y_max - self.y_min
     
     def as_tuple(self):
