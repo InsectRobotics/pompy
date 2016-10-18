@@ -1,4 +1,4 @@
-`pompy` is a `numpy` based implementation of the puff-based odour plume model described in *Filament-Based Atmospheric Dispersion Model to Achieve Short Time-Scale Structure of Odor Plumes* by Farrell et al. (2002).
+`pompy` is a `numpy` based implementation of the puff-based odour plume model described in [*Filament-Based Atmospheric Dispersion Model to Achieve Short Time-Scale Structure of Odor Plumes*](http://link.springer.com/article/10.1023%2FA%3A1016283702837#page-1) by Farrell et al. (2002).
 
 It was developed as part of a MSc by Research project in the Insect Robotics group of in the School of Informatics, University of Edinburgh, into whether and how insects are able to use olfactory landmarks to aid in spatial navigation. This project was motivated by the work of Kathrin Steck and colleagues who discovered that *Cataglyphis fortis*, a Saharan desert ant species, are able to use odour sources in their environment as 'landmarks' to help when navigating back to their nest.
 
