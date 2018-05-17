@@ -282,14 +282,14 @@ class ConcentrationArrayGenerator(object):
             # the possibility of the kernel being partly outside the
             # extents of the destination array
             (w, h) = kernel.shape
-            r_rng_arr = slice(max(0, u - w / 2.),
-                              max(min(u + w / 2., self.nx), 0))
-            c_rng_arr = slice(max(0, v - h / 2.),
-                              max(min(v + h / 2., self.ny), 0))
-            r_rng_knl = slice(max(0, -u + w / 2.),
-                              min(-u + w / 2. + self.nx, w))
-            c_rng_knl = slice(max(0, -v + h / 2.),
-                              min(-v + h / 2. + self.ny, h))
+            r_rng_arr = slice(int(max(0, u - w / 2.)),
+                              int(max(min(u + w / 2., self.nx), 0)))
+            c_rng_arr = slice(int(max(0, v - h / 2.)),
+                              int(max(min(v + h / 2., self.ny), 0)))
+            r_rng_knl = slice(int(max(0, -u + w / 2.)),
+                              int(min(-u + w / 2. + self.nx, w)))
+            c_rng_knl = slice(int(max(0, -v + h / 2.)),
+                              int(min(-v + h / 2. + self.ny, h)))
             # add puff kernel values to concentration field array
             conc_array[r_rng_arr, c_rng_arr] += kernel[r_rng_knl, c_rng_knl]
         return conc_array
