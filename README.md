@@ -32,24 +32,24 @@ rng = np.random.RandomState(seed)
 
 # Define wind model parameters
 wind_model_params = {
-    'sim_region': models.Rectangle(0., -50., 100., 50.),
-    'nx': 21,
-    'ny': 21,
+    'sim_region': models.Rectangle(x_min=0., x_max=100., y_min=-50., y_max=50.),
+    'n_x': 21,
+    'n_y': 21,
     'u_av': 1.,
     'v_av': 0.,
-    'Kx': 2.,
-    'Ky': 2.,
+    'k_x': 2.,
+    'k_y': 2.,
     'noise_gain': 20.,
     'noise_damp': 0.1,
     'noise_bandwidth': 0.2,
 }
 
 # Create wind model object
-wind_model = models.WindModel(noise_rand=rng, **wind_model_params)
+wind_model = models.WindModel(rng=rng, **wind_model_params)
 
 # Define plume simulation region
 # This is a subset of the wind simulation region to minimise boundary effects
-sim_region = models.Rectangle(0., -12.5, 50., 12.5)
+sim_region = models.Rectangle(x_min=0., x_max=50., y_min=-12.5, y_max=12.5)
 
 # Define plume model parameters
 plume_model_params = {
@@ -65,14 +65,13 @@ plume_model_params = {
 
 # Create plume model object
 plume_model = models.PlumeModel(
-    prng=rng, sim_region=sim_region, wind_model=wind_model, 
-    **plume_model_params)
+    rng=rng, sim_region=sim_region, wind_model=wind_model, **plume_model_params)
 
 # Define concentration array (image) generator parameters
 array_gen_params = {
     'array_z': 0.,
-    'nx': 500,
-    'ny': 250,
+    'n_x': 500,
+    'n_y': 250,
     'puff_mol_amount': 8.3e8
 }
 
@@ -87,10 +86,8 @@ ax.axis('off')
 
 # Display initial concentration field as image
 conc_array = array_gen.generate_single_array(plume_model.puff_array)
-im_extents = (sim_region.x_min, sim_region.x_max,
-              sim_region.y_min, sim_region.y_max)
 conc_im = ax.imshow(
-    conc_array.T, extent=im_extents, vmin=0., vmax=1e10, cmap='Reds')
+    conc_array.T, extent=sim_region, vmin=0., vmax=1e10, cmap='Reds')
 
 # Simulation timestep
 dt = 0.01
