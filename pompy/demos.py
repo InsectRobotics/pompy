@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Demonstrations of how to set up models with graphical displays produced using
-matplotlib functions.
-"""
+"""Demonstrations of setting up models and visualising outputs."""
 
 from __future__ import division
 
@@ -13,190 +10,264 @@ __license__ = 'MIT'
 import sys
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from matplotlib.animation import FuncAnimation
 import numpy as np
-import models
-import processors
+from pompy import models, processors
 
 
-def _close_handle(event):
-    print('Simulation aborted.')
-    sys.exit()
+def set_up_figure(fig_size=(8, 4)):
+    """Set up Matplotlib figure with simulation time title text.
 
-
-def _set_up_figure(title_text):
-    """ Generate figure and attach close event. """
-    fig = plt.figure()
-    fig.canvas.set_window_title('Odour plume simulation: ' + title_text)
-    fig.canvas.mpl_connect('close_event', _close_handle)
-    # add simulation time text
-    time_text = fig.text(0.05, 0.95, 'Simulation time: -- seconds')
-    # start matplotlib interactive mode
-    plt.ion()
-    return fig, time_text
-
-
-def _simulation_loop(dt, t_max, time_text, draw_iter_interval, update_func,
-                     draw_func):
-    """ Helper function for running simulation loop.
-
-    Runs loop with time-step updates  applied to models in update_func and any
-    relevant drawing actions applied in draw_func.
+    Parameters
+    ----------
+    title_text : string
+        Text to set figure title to.
+    fig_size : tuple
+        Figure dimensions in inches in order `(width, height)`.
     """
-    num_iter = int(t_max/dt + 0.5)
-    for i in range(1, num_iter + 1):
-        t = i * dt
-        update_func(dt, t)
-        # only update display after a batch of updates to increase speed
-        if i % draw_iter_interval == 0:
-            draw_func()
-            time_text.set_text('Simulation time: {0} seconds'.format(t))
-            plt.draw()
-            plt.pause(0.001)
+    fig, ax = plt.subplots(1, 1, figsize=fig_size)
+    title = ax.set_title('Simulation time = ---- seconds')
+    return fig, ax, title
 
 
-def wind_model_demo(dt=0.01, t_max=100, draw_iter_interval=20):
-    """
-    Demonstration of setting up wind model and displaying with matplotlib
-    quiver plot function.
+def update_decorator(dt, title, steps_per_frame, models):
+    """Decorator for animation update methods."""
+    def inner_decorator(update_function):
+        def wrapped_update(i):
+            for j in range(steps_per_frame):
+                for model in models:
+                    model.update(dt)
+            t = i * steps_per_frame * dt
+            title.set_text('Simulation time = {0:.3f} seconds'.format(t))
+            return [title] + update_function(i)
+        return wrapped_update
+    return inner_decorator
+
+
+def wind_model_demo(dt=0.01, t_max=100, steps_per_frame=20):
+    """Set up wind model and animate velocity field with quiver plot.
+
+    Parameters
+    ----------
+    dt : float
+        Simulation timestep.
+    t_max : float
+        End time to simulate to.
+    steps_per_frame: integer
+        Number of simulation time steps to perform between animation frames.
+
+    Returns
+    -------
+    fig : Figure
+        Matplotlib figure object.
+    ax : AxesSubplot
+        Matplotlib axis object.
+    anim : FuncAnimation
+        Matplotlib animation object.
     """
     # define simulation region
-    wind_region = models.Rectangle(-8, -2, 8, 2)
-    grid_spacing = 0.8
-    wind_nx = int(wind_region.w / grid_spacing) + 1
-    wind_ny = int(wind_region.h / grid_spacing) + 1
+    wind_region = models.Rectangle(x_min=0., x_max=100, y_min=-25., y_max=25.)
     # set up wind model
-    wind_model = models.WindModel(wind_region, wind_nx, wind_ny,
-                                  noise_gain=10., noise_damp=0.1,
-                                  noise_bandwidth=0.5, u_av=3)
+    wind_model = models.WindModel(wind_region, 21, 11, u_av=1., k_x=2., k_y=2.)
     # generate figure and attach close event
-    fig, time_text = _set_up_figure('Wind model demo')
+    fig, ax, title = set_up_figure()
     # create quiver plot of initial velocity field
-    vf_plot = plt.quiver(wind_model.x_points, wind_model.y_points,
-                         wind_model.velocity_field[:, :, 0].T,
-                         wind_model.velocity_field[:, :, 1].T, width=0.003)
+    vf_plot = ax.quiver(wind_model.x_points, wind_model.y_points,
+                        wind_model.velocity_field.T[0],
+                        wind_model.velocity_field.T[1], width=0.003)
     # expand axis limits to make vectors at boundary of field visible
-    plt.axis(plt.axis() + np.array([-0.5, 0.5, -0.5, 0.5]))
-    # define update and draw functions
-    update_func = lambda dt, t: wind_model.update(dt)
-    draw_func = lambda: vf_plot.set_UVC(wind_model.velocity_field[:, :, 0].T,
-                                        wind_model.velocity_field[:, :, 1].T)
-    # start simulation loop
-    _simulation_loop(dt, t_max, time_text, draw_iter_interval, update_func,
-                     draw_func)
-    return fig
+    ax.axis(ax.axis() + np.array([-0.25, 0.25, -0.25, 0.25]))
+    ax.set_xlabel('x-coordinate / m')
+    ax.set_ylabel('y-coordinate / m')
+    ax.set_aspect(1)
+    fig.tight_layout()
+
+    # define update function
+    @update_decorator(dt, title, steps_per_frame, [wind_model])
+    def update(i):
+        vf_plot.set_UVC(
+            wind_model.velocity_field.T[0], wind_model.velocity_field.T[1])
+        return [vf_plot]
+
+    # create animation object
+    n_frame = int(t_max / (dt * steps_per_frame) + 0.5)
+    anim = FuncAnimation(fig, update, n_frame, blit=True)
+    return fig, ax, anim
 
 
-def plume_model_demo(dt=0.01, t_max=100, draw_iter_interval=200):
-    """
-    Demonstration of setting up plume model and displaying with matplotlib
+def plume_model_demo(dt=0.01, t_max=100, steps_per_frame=200):
+    """Set up plume model and animate puffs overlayed over velocity field.
+
+    Puff positions displayed using Matplotlib `scatter` plot function and
+    velocity field displayed using `quiver` plot function.
     plot and quiver functions.
+
+    Parameters
+    ----------
+    dt : float
+        Simulation timestep.
+    t_max : float
+        End time to simulate to.
+    steps_per_frame: integer
+        Number of simulation time steps to perform between animation frames.
+
+    Returns
+    -------
+    fig : Figure
+        Matplotlib figure object.
+    ax : AxesSubplot
+        Matplotlib axis object.
+    anim : FuncAnimation
+        Matplotlib animation object.
     """
     # define simulation region
-    sim_region = models.Rectangle(0., -2., 8., 2.)
+    wind_region = models.Rectangle(x_min=0., x_max=100, y_min=-25., y_max=25.)
     # set up wind model
-    wind_model = models.WindModel(sim_region, 21., 11.,
-                                  u_av=1., Kx=2., Ky=2.)
+    wind_model = models.WindModel(wind_region, 21, 11, u_av=1., k_x=2., k_y=2.)
     # set up plume model
-    plume_model = models.PlumeModel(sim_region, (0.5, 0., 0.), wind_model,
-                                    puff_release_rate=10,
-                                    centre_rel_diff_scale=1.5)
+    sim_region = models.Rectangle(x_min=0., x_max=50, y_min=-12.5, y_max=12.5)
+    plume_model = models.PlumeModel(
+        sim_region, (5., 0., 0.), wind_model, puff_release_rate=10,
+        centre_rel_diff_scale=2)
     # set up figure window
-    fig, time_text = _set_up_figure('Plume model demo')
+    fig, ax, title = set_up_figure()
     # create quiver plot of initial velocity field
     # quiver expects first array dimension (rows) to correspond to y-axis
     # therefore need to transpose
-    vf_plot = plt.quiver(wind_model.x_points, wind_model.y_points,
-                         wind_model.velocity_field[:, :, 0].T,
-                         wind_model.velocity_field[:, :, 1].T, width=0.001)
+    vf_plot = plt.quiver(
+        wind_model.x_points, wind_model.y_points,
+        wind_model.velocity_field.T[0], wind_model.velocity_field.T[1],
+        width=0.003)
     # expand axis limits to make vectors at boundary of field visible
-    vf_plot.axes.axis(vf_plot.axes.axis() + np.array([-0.5, 0.5, -0.5, 0.5]))
+    ax.axis(ax.axis() + np.array([-0.25, 0.25, -0.25, 0.25]))
     # draw initial puff positions with scatter plot
-    pp_plot = plt.scatter(plume_model.puff_array[:, 0],
-                          plume_model.puff_array[:, 1],
-                          100 * plume_model.puff_array[:, 3]**0.5,
-                          c='r', edgecolors='none')
+    radius_mult = 200
+    pp_plot = plt.scatter(
+        plume_model.puff_array[:, 0], plume_model.puff_array[:, 1],
+        radius_mult * plume_model.puff_array[:, 3]**0.5, c='r',
+        edgecolors='none')
+    ax.set_xlabel('x-coordinate / m')
+    ax.set_ylabel('y-coordinate / m')
+    ax.set_aspect(1)
+    fig.tight_layout()
 
-    # define update and draw functions
-
-    def update_func(dt, t):
-        wind_model.update(dt)
-        plume_model.update(dt)
-
-    def draw_func():
+    # define update function
+    @update_decorator(dt, title, steps_per_frame, [wind_model, plume_model])
+    def update(i):
         # update velocity field quiver plot data
         vf_plot.set_UVC(wind_model.velocity_field[:, :, 0].T,
                         wind_model.velocity_field[:, :, 1].T)
         # update puff position scatter plot positions and sizes
         pp_plot.set_offsets(plume_model.puff_array[:, :2])
-        pp_plot._sizes = 100*plume_model.puff_array[:, 3]**0.5
+        pp_plot._sizes = radius_mult * plume_model.puff_array[:, 3]**0.5
+        return [vf_plot, pp_plot]
 
-    # begin simulation loop
-    _simulation_loop(dt, t_max, time_text, draw_iter_interval, update_func,
-                     draw_func)
-    return fig
+    # create animation object
+    n_frame = int(t_max / (dt * steps_per_frame) + 0.5)
+    anim = FuncAnimation(fig, update, frames=n_frame, blit=True)
+    return fig, ax, anim
 
 
-def concentration_array_demo(dt=0.01, t_max=100, draw_iter_interval=50):
-    """
+def concentration_array_demo(dt=0.01, t_max=100, steps_per_frame=50):
+    """Set up plume model and animate concentration fields.
+
     Demonstration of setting up plume model and processing the outputted
-    puff arrays with the ConcentrationArrayGenerator class, the resulting
-    arrays being displayed with the matplotlib imshow function.
+    puff arrays with the `ConcentrationArrayGenerator` class, the resulting
+    arrays being displayed with the Matplotlib `imshow` function.
+
+    Parameters
+    ----------
+    dt : float
+        Simulation timestep.
+    t_max : float
+        End time to simulate to.
+    steps_per_frame: integer
+        Number of simulation time steps to perform between animation frames.
+
+    Returns
+    -------
+    fig : Figure
+        Matplotlib figure object.
+    ax : AxesSubplot
+        Matplotlib axis object.
+    anim : FuncAnimation
+        Matplotlib animation object.
     """
     # define simulation region
-    wind_region = models.Rectangle(0., -2., 10., 2.)
-    sim_region = models.Rectangle(0., -1., 2., 1.)
+    wind_region = models.Rectangle(x_min=0., x_max=10., y_min=-2., y_max=2.)
+    sim_region = models.Rectangle(x_min=0., x_max=4, y_min=-1., y_max=1.)
     # set up wind model
-    wind_model = models.WindModel(wind_region, 21., 11., u_av=1.,)
+    wind_model = models.WindModel(wind_region, 21, 11, u_av=1.,)
     # set up plume model
-    plume_model = models.PlumeModel(sim_region, (0.1, 0., 0.), wind_model,
-                                    centre_rel_diff_scale=1.5,
-                                    puff_release_rate=500,
-                                    puff_init_rad=0.001)
+    plume_model = models.PlumeModel(
+        sim_region, (0.1, 0., 0.), wind_model, centre_rel_diff_scale=1.5,
+        puff_release_rate=500, puff_init_rad=0.001)
     # set up concentration array generator
-    array_gen = processors.ConcentrationArrayGenerator(sim_region, 0.01, 500,
-                                                       500, 1.)
+    array_gen = processors.ConcentrationArrayGenerator(
+        sim_region, 0.01, 500, 500, 1.)
     # set up figure
-    fig, time_text = _set_up_figure('Concentration field array demo')
+    fig, ax, title = set_up_figure()
     # display initial concentration field as image
     conc_array = array_gen.generate_single_array(plume_model.puff_array)
-    im_extents = (sim_region.x_min, sim_region.x_max,
-                  sim_region.y_min, sim_region.y_max)
-    conc_im = plt.imshow(conc_array.T, extent=im_extents, vmin=0, vmax=3e4,
-                         cmap=cm.Reds)
-    conc_im.axes.set_xlabel('x / m')
-    conc_im.axes.set_ylabel('y / m')
+    conc_im = plt.imshow(conc_array.T, extent=sim_region, vmin=0, vmax=3e4,
+                         cmap='Reds')
+    ax.set_xlabel('x-coordinate / m')
+    ax.set_ylabel('y-coordinate / m')
+    ax.set_aspect(1)
+    fig.tight_layout()
 
-    # define update and draw functions
+    # define update function
+    @update_decorator(dt, title, steps_per_frame, [wind_model, plume_model])
+    def update(i):
+        conc_im.set_data(
+            array_gen.generate_single_array(plume_model.puff_array).T)
+        return [conc_im]
 
-    def update_func(dt, t):
-        wind_model.update(dt)
-        plume_model.update(dt)
-
-    draw_func = lambda: conc_im.set_data(
-        array_gen.generate_single_array(plume_model.puff_array).T)
-    # start simulation loop
-    _simulation_loop(dt, t_max, time_text, draw_iter_interval, update_func,
-                     draw_func)
-    return fig
+    # create animation object
+    n_frame = int(t_max / (dt * steps_per_frame) + 0.5)
+    anim = FuncAnimation(fig, update, frames=n_frame, blit=True)
+    return fig, ax, anim
 
 
-def conc_point_val_demo(dt=0.01, t_max=5, draw_iter_interval=20, x=1., y=0.0):
-    """
+def conc_point_val_demo(dt=0.01, t_max=5, steps_per_frame=1, x=1., y=0.0):
+    """Set up plume model and animate concentration at a point as time series.
+
     Demonstration of setting up plume model and processing the outputted
     puff arrays with the ConcentrationPointValueCalculator class, the
     resulting concentration time course at a point in the odour plume being
-    displayed with the matplotlib plot function.
+    displayed with the Matplotlib `plot` function.
+
+    Parameters
+    ----------
+    dt : float
+        Simulation timestep.
+    t_max : float
+        End time to simulate to.
+    steps_per_frame: integer
+        Number of simulation time steps to perform between animation frames.
+    x : float
+        x-coordinate of point to measure concentration at.
+    y : float
+        y-coordinate of point to measure concentration at.
+
+    Returns
+    -------
+    fig : Figure
+        Matplotlib figure object.
+    ax : AxesSubplot
+        Matplotlib axis object.
+    anim : FuncAnimation
+        Matplotlib animation object.
     """
     # define simulation region
-    wind_region = models.Rectangle(0., -2., 10., 2.)
-    sim_region = models.Rectangle(0., -1., 2., 1.)
+    wind_region = models.Rectangle(x_min=0., x_max=10., y_min=-2., y_max=2.)
+    sim_region = models.Rectangle(x_min=0., x_max=2, y_min=-1., y_max=1.)
     # set up wind model
-    wind_model = models.WindModel(wind_region, 21., 11., u_av=2.)
+    wind_model = models.WindModel(wind_region, 21, 11, u_av=2.)
     # set up plume model
-    plume_model = models.PlumeModel(sim_region, (0.1, 0., 0.), wind_model,
-                                    centre_rel_diff_scale=1.5,
-                                    puff_release_rate=25,
-                                    puff_init_rad=0.01)
+    plume_model = models.PlumeModel(
+        sim_region, (0.1, 0., 0.), wind_model, centre_rel_diff_scale=1.5,
+        puff_release_rate=25, puff_init_rad=0.01)
     # let simulation run for 10s to get plume established
     for t in np.arange(0, 10, dt):
         wind_model.update(dt)
@@ -207,88 +278,26 @@ def conc_point_val_demo(dt=0.01, t_max=5, draw_iter_interval=20, x=1., y=0.0):
     conc_vals.append(val_calc.calc_conc_point(plume_model.puff_array, x, y))
     ts = [0.]
     # set up figure
-    fig, time_text = _set_up_figure('Concentration point value trace demo')
+    fig, ax, title = set_up_figure()
     # display initial concentration field as image
     conc_line, = plt.plot(ts, conc_vals)
-    conc_line.axes.set_xlim(0., t_max)
-    conc_line.axes.set_ylim(0., .5)
-    conc_line.axes.set_xlabel('t / s')
-    conc_line.axes.set_ylabel('Normalised concentration')
-    conc_line.axes.grid(True)
+    ax.set_xlim(0., t_max)
+    ax.set_ylim(0., .5)
+    ax.set_xlabel('Time / s')
+    ax.set_ylabel('Normalised concentration')
+    ax.grid(True)
+    fig.tight_layout()
 
-    # define update and draw functions
-
-    def update_func(dt, t):
-        wind_model.update(dt)
-        plume_model.update(dt)
-        ts.append(t)
+    # define update function
+    @update_decorator(dt, title, steps_per_frame, [wind_model, plume_model])
+    def update(i):
+        ts.append(dt * i * steps_per_frame)
         conc_vals.append(
             val_calc.calc_conc_point(plume_model.puff_array, x, y))
+        conc_line.set_data(ts, conc_vals)
+        return [conc_line]
 
-    draw_func = lambda: conc_line.set_data(ts, conc_vals)
-    # start simulation loop
-    _simulation_loop(dt, t_max, time_text, draw_iter_interval, update_func,
-                     draw_func)
-    return fig
-
-
-def wind_vel_and_conc_demo(dt=0.01, t_max=5, draw_iter_interval=50):
-    """
-    Demonstration of setting up plume model and processing the outputted
-    puff arrays with the ConcentrationArrayGenerator class, the resulting
-    arrays being displayed with the matplotlib imshow function.
-    """
-    # define simulation region
-    wind_region = models.Rectangle(0., -1., 4., 1.)
-    sim_region = models.Rectangle(0., -1., 4., 1.)
-    # set up wind model
-    wind_model = models.WindModel(wind_region, 11., 11., u_av=1.,
-                                  noise_gain=9., noise_bandwidth=0.3)
-    # set up plume model
-    plume_model = models.PlumeModel(sim_region, (0.1, 0., 0.), wind_model,
-                                    centre_rel_diff_scale=1.5,
-                                    puff_release_rate=200,
-                                    puff_init_rad=0.001)
-    for t in np.arange(0, 1, dt):
-        wind_model.update(dt)
-        plume_model.update(dt)
-    # set up concentration array generator
-    array_gen = processors.ConcentrationArrayGenerator(sim_region, 0.01, 1000,
-                                                       500, 1.)
-    # set up figure
-    fig, time_text = _set_up_figure('Concentration array demo')
-    ax_c = fig.add_subplot('111')
-    # ax_w = fig.add_subplot('122')
-    # display initial wind velocity field as quiver plot
-    vf_plot = ax_c.quiver(wind_model.x_points, wind_model.y_points,
-                          wind_model.velocity_field[:, :, 0].T,
-                          wind_model.velocity_field[:, :, 1].T, width=0.002)
-    ax_c.set_xlabel('x / m')
-    ax_c.set_ylabel('y / m')
-    ax_c.set_aspect(1)
-    # display initial concentration field as image
-    conc_array = (
-        array_gen.generate_single_array(plume_model.puff_array).T[::-1])
-    im_extents = (sim_region.x_min, sim_region.x_max,
-                  sim_region.y_min, sim_region.y_max)
-    conc_im = ax_c.imshow(conc_array, extent=im_extents, vmin=0, vmax=5e3,
-                          cmap=cm.Reds)
-    ax_c.set_xlabel('x / m')
-    ax_c.set_ylabel('y / m')
-
-    # define update and draw functions
-
-    def update_func(dt, t):
-        wind_model.update(dt)
-        plume_model.update(dt)
-
-    def draw_func():
-        conc_im.set_data(
-            array_gen.generate_single_array(plume_model.puff_array).T[::-1, :])
-        vf_plot.set_UVC(wind_model.velocity_field[:, :, 0].T,
-                        wind_model.velocity_field[:, :, 1].T)
-
-    # start simulation loop
-    _simulation_loop(dt, t_max, time_text, draw_iter_interval, update_func,
-                     draw_func)
-    return fig
+    # create animation object
+    n_frame = int(t_max / (dt * steps_per_frame) + 0.5)
+    anim = FuncAnimation(fig, update, frames=n_frame, blit=True)
+    return fig, ax, anim
