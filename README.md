@@ -1,8 +1,8 @@
-## `pompy` - *p*uff-based *o*dour plume *m*odel in *Py*thon
+## PomPy - *p*uff-based *o*dour plume *m*odel in *Py*thon
 
 [![Documentation Status](https://readthedocs.org/projects/pompy-docs/badge/?version=latest)](https://pompy-docs.readthedocs.io/en/latest/?badge=latest)
 
-`pompy` is a NumPy based implementation of the puff-based odour plume model described in [*Filament-Based Atmospheric Dispersion Model to Achieve Short Time-Scale Structure of Odor Plumes*](http://link.springer.com/article/10.1023%2FA%3A1016283702837#page-1) by Farrell et al. (2002).
+PomPy is a NumPy based implementation of the puff-based odour plume model described in [*Filament-Based Atmospheric Dispersion Model to Achieve Short Time-Scale Structure of Odor Plumes*](http://link.springer.com/article/10.1023%2FA%3A1016283702837#page-1) by Farrell et al. (2002).
 
 ![Plume model animation](plume.gif "Plume model animation example.")
 
@@ -12,9 +12,9 @@ This Python package allows simulation of dynamic 2D odour concentration fields w
 
 ### Installation and requirements
 
-`pompy` was developed in Python 2.7 though it may be compatible with newer Python versions. For basic usage of the models the two dependencies are NumPy and SciPy. For the demonstrations in the `pompy.demo` module Matplotlib is also required. The [`requirements.txt`](requirements.txt) file lists versions of NumPy, SciPy and Matplotlib known to work with `pompy`. A Jupyter notebook server installation will also be required to run the example notebooks locally. 
+PomPy was developed in Python 2.7 though it may be compatible with newer Python versions. For basic usage of the models the two dependencies are NumPy and SciPy. For the demonstrations in the `pompy.demo` module Matplotlib is also required. The [`requirements.txt`](requirements.txt) file lists versions of NumPy, SciPy and Matplotlib known to work with `pompy`. A Jupyter notebook server installation will also be required to run the example notebooks locally. 
 
-To install `pompy` in the current Python environment run
+To install PomPy in the current Python environment run
 
 ```
 python setup.py install
@@ -30,9 +30,9 @@ pip install -r requirements.txt
 
 Documentation of the `pompy` API is available at [Read the Docs](https://pompy-docs.readthedocs.io/en/latest/).
 
-Two Jupyter notebooks showing examples of using the package are included in the repository root directory. The [`Farrell et al. (2002) example.ipynb`](Farrell%20et%20al.%20%282002%29%20example.ipynb) notebook file illustrates an example of using the `pompy` package to generate an animation of an odour plume using the simulation parameters described in Farrell et al. (2002) and includes keys to match the symbols used to define the parameter in the paper with the relevant `pompy` class attributes. The [`Demonstration.ipynb`](Demonstrations.ipynb) and accompanying module `pompy.demos` give several other examples of setting up plume models using `pompy` and visualising the simulations.
+Two Jupyter notebooks showing examples of using the package are included in the repository root directory. The [`Farrell et al. (2002) example.ipynb`](Farrell%20et%20al.%20%282002%29%20example.ipynb) notebook file illustrates an example of using PomPy to generate an animation of an odour plume using the simulation parameters described in Farrell et al. (2002) and includes keys to match the symbols used to define the parameter in the paper with the relevant `pompy` class attributes. The [`Demonstration.ipynb`](Demonstrations.ipynb) and accompanying module `pompy.demos` give several other examples of setting up plume models using `pompy` and visualising the simulations.
 
-The below script will generate a 20 second MP4 animation (see above for GIF version) of a generated plume with model parameters consistent with those proposed in the Farrell et al. (2002) paper.
+The below script will generate a 20 second MP4 animation (see above for animated GIF version) of a generated plume with model parameters consistent with those proposed in the Farrell et al. (2002) paper.
 
 ```python
 from pompy import models, processors
