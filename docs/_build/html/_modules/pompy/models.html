@@ -1,0 +1,681 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>pompy.models &#8212; pompy 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pompy 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pompy.models</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;Implementations of puff-based plume model components.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
+
+<span class="n">__authors__</span> <span class="o">=</span> <span class="s1">&#39;Matt Graham&#39;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s1">&#39;MIT&#39;</span>
+
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.interpolate</span> <span class="k">as</span> <span class="nn">interp</span>
+
+
+<span class="k">class</span> <span class="nc">SlottedIterable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for objects with slots which can be used as iterables.</span>
+
+<span class="sd">    Allows instances of subclasses to be used as iterables and provides a</span>
+<span class="sd">    human-readable string representation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterate through slot attributes in defined order.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__slots__</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;String representation of object.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{cls}</span><span class="s1">(</span><span class="si">{attr}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">=</span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">name</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__slots__</span><span class="p">]))</span>
+
+
+<div class="viewcode-block" id="Puff"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.Puff">[docs]</a><span class="k">class</span> <span class="nc">Puff</span><span class="p">(</span><span class="n">SlottedIterable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Container for the properties of a single odour puff.&quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;r_sq&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Puff.__init__"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.Puff.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">r_sq</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : float</span>
+<span class="sd">            x-coordinate of puff centre.</span>
+<span class="sd">        y : float</span>
+<span class="sd">            y-coordinate of puff centre.</span>
+<span class="sd">        z : float</span>
+<span class="sd">            z-coordinate of puff centre.</span>
+<span class="sd">        r_sq : float</span>
+<span class="sd">            Squared radius of puff.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">r_sq</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">,</span> <span class="s1">&#39;r_sq must be non-negative.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">z</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r_sq</span> <span class="o">=</span> <span class="n">r_sq</span></div></div>
+
+
+<div class="viewcode-block" id="Rectangle"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.Rectangle">[docs]</a><span class="k">class</span> <span class="nc">Rectangle</span><span class="p">(</span><span class="n">SlottedIterable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Axis-aligned rectangular region.</span>
+
+<span class="sd">    Rectangle is defined by two points `(x_min, y_min)` and `(x_max, y_max)`</span>
+<span class="sd">    with it required that `x_max &gt; x_min` and `y_max &gt; y_min`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;x_min&#39;</span><span class="p">,</span> <span class="s1">&#39;x_max&#39;</span><span class="p">,</span> <span class="s1">&#39;y_min&#39;</span><span class="p">,</span> <span class="s1">&#39;y_max&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Rectangle.__init__"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.Rectangle.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x_min : float</span>
+<span class="sd">            x-coordinate of bottom-left corner of rectangle.</span>
+<span class="sd">        y_min : float</span>
+<span class="sd">            x-coordinate of bottom-right corner of rectangle.</span>
+<span class="sd">        x_max : float</span>
+<span class="sd">            x-coordinate of top-right corner of rectangle.</span>
+<span class="sd">        y_max : float</span>
+<span class="sd">            y-coordinate of top-right corner of rectangle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">x_min</span> <span class="o">&lt;</span> <span class="n">x_max</span><span class="p">,</span> <span class="s1">&#39;Rectangle x_min must be &lt; x_max.&#39;</span>
+        <span class="k">assert</span> <span class="n">y_min</span> <span class="o">&lt;</span> <span class="n">y_max</span><span class="p">,</span> <span class="s1">&#39;Rectangle y_min must be &lt; y_max.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_min</span> <span class="o">=</span> <span class="n">x_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_max</span> <span class="o">=</span> <span class="n">x_max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_min</span> <span class="o">=</span> <span class="n">y_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_max</span> <span class="o">=</span> <span class="n">y_max</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">w</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Width of rectangle (i.e. distance covered on x-axis).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_max</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_min</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Height of rectangle (i.e. distance covered on y-axis).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_max</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_min</span>
+
+<div class="viewcode-block" id="Rectangle.contains"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.Rectangle.contains">[docs]</a>    <span class="k">def</span> <span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Whether `(x, y)`` position is contained within this rectangle.</span>
+
+<span class="sd">        Tests whether the supplied position, an `(x,y)` pair, is contained</span>
+<span class="sd">        within the region defined by this `Rectangle` object and returns `True`</span>
+<span class="sd">        if so and `False` if not.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : float</span>
+<span class="sd">            x-coordinate of position to test.</span>
+<span class="sd">        y : float</span>
+<span class="sd">            y-coordinate of position to test.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        contains : boolean</span>
+<span class="sd">            `True` if `(x, y)` is within the rectangle and `False` otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_min</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_max</span> <span class="ow">and</span>
+                <span class="n">y</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_min</span> <span class="ow">and</span> <span class="n">y</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_max</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PlumeModel"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.PlumeModel">[docs]</a><span class="k">class</span> <span class="nc">PlumeModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Puff-based odour plume dispersion model from Farrell et. al. (2002).</span>
+
+<span class="sd">    The odour plume is modelled as a series of odour puffs which are released</span>
+<span class="sd">    from a fixed source position. The odour puffs are dispersed by a modelled</span>
+<span class="sd">    2D wind velocity field plus a white noise process model of mid-scale puff</span>
+<span class="sd">    mass diffusion relative to the plume centre line. The puffs also spread in</span>
+<span class="sd">    size over time to model fine-scale diffusive processes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PlumeModel.__init__"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.PlumeModel.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sim_region</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">source_pos</span><span class="o">=</span><span class="p">(</span><span class="mf">5.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">),</span>
+                 <span class="n">wind_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_z_disp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">centre_rel_diff_scale</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span>
+                 <span class="n">puff_init_rad</span><span class="o">=</span><span class="mf">0.0316</span><span class="p">,</span> <span class="n">puff_spread_rate</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+                 <span class="n">puff_release_rate</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">init_num_puffs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_num_puffs</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                 <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sim_region : Rectangle</span>
+<span class="sd">            2D rectangular region of space over which the simulation is</span>
+<span class="sd">            conducted. This should be a subset of the simulation region defined</span>
+<span class="sd">            for the wind model.</span>
+<span class="sd">        source_pos : float iterable</span>
+<span class="sd">            Coordinates of the fixed source position within the simulation</span>
+<span class="sd">            region from which puffs are released. If a length 2 iterable is</span>
+<span class="sd">            passed, the z coordinate will be set a default of 0</span>
+<span class="sd">            (dimension: length).</span>
+<span class="sd">        wind_model : WindModel</span>
+<span class="sd">            Dynamic model of the large scale wind velocity field in the</span>
+<span class="sd">            simulation region.</span>
+<span class="sd">        model_z_disp : boolean</span>
+<span class="sd">            Whether to model dispersion of puffs from plume centre-line in z</span>
+<span class="sd">            direction. If set `True` then the puffs will be modelled as</span>
+<span class="sd">            dispersing in the vertical direction by a random walk process (the</span>
+<span class="sd">            wind model is limited to 2D hence the vertical wind speed is</span>
+<span class="sd">            assumed to be zero), if set `False` the puff z-coordinates will not</span>
+<span class="sd">            be updated from their initial value of 0.</span>
+<span class="sd">        centre_rel_diff_scale : float or float iterable</span>
+<span class="sd">            Scaling for the stochastic process used to model the centre-line</span>
+<span class="sd">            relative diffusive transport of puffs. Either a single float value</span>
+<span class="sd">            of isotropic diffusion in all directions, or one of a pair of</span>
+<span class="sd">            values specifying different scales for the x and y directions</span>
+<span class="sd">            respectively if `model_z_disp=False` or a triplet of values</span>
+<span class="sd">            specifying different scales for x, y and z scales respectively if</span>
+<span class="sd">            `model_z_disp=True` (dimension: length / time**0.5).</span>
+<span class="sd">        puff_init_rad: float</span>
+<span class="sd">            Initial radius of the puffs (dimension: length).</span>
+<span class="sd">        puff_spread_rate : float</span>
+<span class="sd">            Constant which determines the rate at which the odour puffs</span>
+<span class="sd">            increase in size over time (dimension: length**2 / time).</span>
+<span class="sd">        puff_release_rate : float</span>
+<span class="sd">            Mean rate at which new puffs are released into the plume. Puff</span>
+<span class="sd">            release is modelled as a stochastic Poisson process, with each puff</span>
+<span class="sd">            released assumed to be independent and the mean release rate fixed</span>
+<span class="sd">            (dimension: count/time).</span>
+<span class="sd">        init_num_puffs : integer</span>
+<span class="sd">            Initial number of puffs to release at the beginning of the</span>
+<span class="sd">            simulation.</span>
+<span class="sd">        max_num_puffs : integer</span>
+<span class="sd">            Maximum number of puffs to permit to be in existence simultaneously</span>
+<span class="sd">            within model, used to limit memory and processing requirements of</span>
+<span class="sd">            model. This parameter needs to be set carefully in relation to the</span>
+<span class="sd">            puff release rate and simulation region size as if too small it</span>
+<span class="sd">            will lead to breaks in puff release when the number of puffs</span>
+<span class="sd">            remaining in the simulation region reaches the limit.</span>
+<span class="sd">        rng : RandomState</span>
+<span class="sd">            Random number generator to use in generating input noise. Defaults</span>
+<span class="sd">            to `numpy.random` global generator if set to `None` however a</span>
+<span class="sd">            seeded `RandomState` object can be passed if it is desired to have</span>
+<span class="sd">            reproducible output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sim_region</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sim_region</span> <span class="o">=</span> <span class="n">Rectangle</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">50.</span><span class="p">,</span> <span class="o">-</span><span class="mf">12.5</span><span class="p">,</span> <span class="mf">12.5</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim_region</span> <span class="o">=</span> <span class="n">sim_region</span>
+        <span class="k">if</span> <span class="n">wind_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">wind_model</span> <span class="o">=</span> <span class="n">WindModel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wind_model</span> <span class="o">=</span> <span class="n">wind_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">rng</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_z_disp</span> <span class="o">=</span> <span class="n">model_z_disp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vel_dim</span> <span class="o">=</span> <span class="mi">3</span> <span class="k">if</span> <span class="n">model_z_disp</span> <span class="k">else</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">model_z_disp</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">centre_rel_diff_scale</span><span class="p">,</span> <span class="s1">&#39;__len__&#39;</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">centre_rel_diff_scale</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s1">&#39;When model_z_disp=True, centre_rel_diff_scale must be a &#39;</span>
+                <span class="s1">&#39;scalar or length 1 or 3 iterable.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centre_rel_diff_scale</span> <span class="o">=</span> <span class="n">centre_rel_diff_scale</span>
+        <span class="k">assert</span> <span class="n">sim_region</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">source_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">source_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span>
+            <span class="s1">&#39;Specified source position must be within simulation region.&#39;</span><span class="p">)</span>
+        <span class="c1"># default to zero height source when source_pos is 2D</span>
+        <span class="n">source_z</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">source_pos</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">source_pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_new_puff_params</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">source_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">source_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">source_z</span><span class="p">,</span> <span class="n">puff_init_rad</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">puff_spread_rate</span> <span class="o">=</span> <span class="n">puff_spread_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">puff_release_rate</span> <span class="o">=</span> <span class="n">puff_release_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_num_puffs</span> <span class="o">=</span> <span class="n">max_num_puffs</span>
+        <span class="c1"># initialise puff list with specified number of new puffs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">puffs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Puff</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_new_puff_params</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">init_num_puffs</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="PlumeModel.update"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.PlumeModel.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update plume puff objects by forward intgating one time-step.</span>
+
+<span class="sd">        Performs a single time-step update of plume model using Euler</span>
+<span class="sd">        integration scheme.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            Simulation time-step (dimension: time).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># add more puffs (stochastically) if enough capacity</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">puffs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_num_puffs</span><span class="p">:</span>
+            <span class="c1"># puff release modelled as Poisson process at fixed mean rate</span>
+            <span class="c1"># with number to release clipped if it would otherwise exceed</span>
+            <span class="c1"># the maximum allowed</span>
+            <span class="n">num_to_release</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">puff_release_rate</span> <span class="o">*</span> <span class="n">dt</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_num_puffs</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">puffs</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">puffs</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="n">Puff</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_new_puff_params</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_to_release</span><span class="p">)]</span>
+        <span class="c1"># initialise empty list for puffs that have not left simulation area</span>
+        <span class="n">alive_puffs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">puff</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">puffs</span><span class="p">:</span>
+            <span class="c1"># interpolate wind velocity at Puff position from wind model grid</span>
+            <span class="c1"># assuming zero wind speed in vertical direction if modelling</span>
+            <span class="c1"># z direction dispersion</span>
+            <span class="n">wind_vel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vel_dim</span><span class="p">)</span>
+            <span class="n">wind_vel</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wind_model</span><span class="o">.</span><span class="n">velocity_at_pos</span><span class="p">(</span><span class="n">puff</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">puff</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+            <span class="c1"># approximate centre-line relative puff transport velocity</span>
+            <span class="c1"># component as being a (Gaussian) white noise process scaled by</span>
+            <span class="c1"># constants</span>
+            <span class="n">filament_diff_vel</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_vel_dim</span><span class="p">)</span> <span class="o">*</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">centre_rel_diff_scale</span><span class="p">)</span>
+            <span class="n">vel</span> <span class="o">=</span> <span class="n">wind_vel</span> <span class="o">+</span> <span class="n">filament_diff_vel</span>
+            <span class="c1"># update puff position using Euler integration</span>
+            <span class="n">puff</span><span class="o">.</span><span class="n">x</span> <span class="o">+=</span> <span class="n">vel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">dt</span>
+            <span class="n">puff</span><span class="o">.</span><span class="n">y</span> <span class="o">+=</span> <span class="n">vel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">dt</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_z_disp</span><span class="p">:</span>
+                <span class="n">puff</span><span class="o">.</span><span class="n">z</span> <span class="o">+=</span> <span class="n">vel</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">dt</span>
+            <span class="c1"># update puff size using Euler integration with second puff</span>
+            <span class="c1"># growth model described in paper</span>
+            <span class="n">puff</span><span class="o">.</span><span class="n">r_sq</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">puff_spread_rate</span> <span class="o">*</span> <span class="n">dt</span>
+            <span class="c1"># only keep puff alive if it is still in the simulated region</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_region</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">puff</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">puff</span><span class="o">.</span><span class="n">y</span><span class="p">):</span>
+                <span class="n">alive_puffs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">puff</span><span class="p">)</span>
+        <span class="c1"># store alive puffs only</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">puffs</span> <span class="o">=</span> <span class="n">alive_puffs</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">puff_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;NumPy array of the properties of the simulated puffs.</span>
+
+<span class="sd">        Each row corresponds to one puff with the first column containing the</span>
+<span class="sd">        puff position x-coordinate, the second the y-coordinate, the third the</span>
+<span class="sd">        z-coordinate and the fourth the puff squared radius.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">tuple</span><span class="p">(</span><span class="n">puff</span><span class="p">)</span> <span class="k">for</span> <span class="n">puff</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">puffs</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="WindModel"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.WindModel">[docs]</a><span class="k">class</span> <span class="nc">WindModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wind velocity model to calculate advective transport of odour.</span>
+
+<span class="sd">    A 2D approximation is used as described in the paper, with the wind</span>
+<span class="sd">    velocities calculated over a regular 2D grid of points using a finite</span>
+<span class="sd">    difference method. The boundary conditions at the edges of the simulated</span>
+<span class="sd">    region are for both components of the velocity field constant mean values</span>
+<span class="sd">    plus coloured noise. For each of the field components these are calculated</span>
+<span class="sd">    for the four corners of the simulated region and then linearly interpolated</span>
+<span class="sd">    over the edges.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="WindModel.__init__"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.WindModel.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sim_region</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_x</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span> <span class="n">n_y</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span> <span class="n">u_av</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">v_av</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+                 <span class="n">k_x</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span> <span class="n">k_y</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span> <span class="n">noise_gain</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span> <span class="n">noise_damp</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                 <span class="n">noise_bandwidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">use_original_noise_updates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sim_region : Rectangle</span>
+<span class="sd">            Two-dimensional rectangular region over which to model wind</span>
+<span class="sd">            velocity field.</span>
+<span class="sd">        n_x : integer</span>
+<span class="sd">            Number of grid points in x direction.</span>
+<span class="sd">        n_y : integer</span>
+<span class="sd">            Number of grid points in y direction.</span>
+<span class="sd">        u_av : float</span>
+<span class="sd">            Mean x-component of wind velocity (dimension: length / time).</span>
+<span class="sd">        v_av : float</span>
+<span class="sd">            Mean y-component of wind velocity (dimension: length / time).</span>
+<span class="sd">        k_x : float or array_like</span>
+<span class="sd">            Diffusivity constant in x direction. Either a single scalar value</span>
+<span class="sd">            across the whole simulated region or an array of size `(n_x, n_y)`</span>
+<span class="sd">            defining values for each grid point (dimension: length**2 / time).</span>
+<span class="sd">        k_y : float or array_like</span>
+<span class="sd">            Diffusivity constant in y direction. Either a single scalar value</span>
+<span class="sd">            across the whole simulated region or an array of size `(n_x, n_y)`</span>
+<span class="sd">            defining values for each grid point (dimension: length**2 / time).</span>
+<span class="sd">        noise_gain : float</span>
+<span class="sd">            Input gain constant for boundary condition noise generation</span>
+<span class="sd">            (dimensionless).</span>
+<span class="sd">        noise_damp : float</span>
+<span class="sd">            Damping ratio for boundary condition noise generation</span>
+<span class="sd">            (dimensionless).</span>
+<span class="sd">        noise_bandwidth : float</span>
+<span class="sd">            Bandwidth for boundary condition noise generation (dimension:</span>
+<span class="sd">            angle / time).</span>
+<span class="sd">        use_original_noise_updates : boolean</span>
+<span class="sd">            Whether to use the original non-SDE based updates for the noise</span>
+<span class="sd">            process as defined in Farrell et al. (2002), see notes in</span>
+<span class="sd">            `ColouredNoiseGenerator` documentation.</span>
+<span class="sd">        rng : RandomState</span>
+<span class="sd">            Random number generator to use in generating input noise. Defaults</span>
+<span class="sd">            to `numpy.random` global generator if set to `None` however a</span>
+<span class="sd">            seeded `RandomState` object can be passed if it is desired to have</span>
+<span class="sd">            reproducible output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sim_region</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sim_region</span> <span class="o">=</span> <span class="n">Rectangle</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim_region</span> <span class="o">=</span> <span class="n">sim_region</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u_av</span> <span class="o">=</span> <span class="n">u_av</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_av</span> <span class="o">=</span> <span class="n">v_av</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_x</span> <span class="o">=</span> <span class="n">n_x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_y</span> <span class="o">=</span> <span class="n">n_y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_x</span> <span class="o">=</span> <span class="n">k_x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_y</span> <span class="o">=</span> <span class="n">k_y</span>
+        <span class="c1"># set coloured noise generator for applying boundary condition</span>
+        <span class="c1"># need to generate coloured noise samples at four corners of boundary</span>
+        <span class="c1"># for both components of the wind velocity field so (2,8) state</span>
+        <span class="c1"># vector (2 as state includes first derivative)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_gen</span> <span class="o">=</span> <span class="n">ColouredNoiseGenerator</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">)),</span> <span class="n">noise_damp</span><span class="p">,</span> <span class="n">noise_bandwidth</span><span class="p">,</span> <span class="n">noise_gain</span><span class="p">,</span>
+            <span class="n">use_original_noise_updates</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+        <span class="c1"># compute grid node spacing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="n">sim_region</span><span class="o">.</span><span class="n">w</span> <span class="o">/</span> <span class="p">(</span><span class="n">n_x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># x grid point spacing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">=</span> <span class="n">sim_region</span><span class="o">.</span><span class="n">h</span> <span class="o">/</span> <span class="p">(</span><span class="n">n_y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># y grid point spacing</span>
+        <span class="c1"># initialise wind velocity field to mean values</span>
+        <span class="c1"># +2s are to account for boundary grid points</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n_x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_y</span> <span class="o">+</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">u_av</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n_x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_y</span> <span class="o">+</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">v_av</span>
+        <span class="c1"># create views on to field interiors (i.e. not including boundaries)</span>
+        <span class="c1"># for notational ease - note this does not copy any data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_u_int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_u</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_v_int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># preassign array of corner means values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_corner_means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">u_av</span><span class="p">,</span> <span class="n">v_av</span><span class="p">])</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="c1"># precompute linear ramp arrays with size of boundary edges for</span>
+        <span class="c1"># linear interpolation of corner values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ramp_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">n_x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ramp_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">n_y</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># set up cubic spline interpolator for calculating off-grid wind</span>
+        <span class="c1"># velocity field values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">sim_region</span><span class="o">.</span><span class="n">x_min</span><span class="p">,</span> <span class="n">sim_region</span><span class="o">.</span><span class="n">x_max</span><span class="p">,</span> <span class="n">n_x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">sim_region</span><span class="o">.</span><span class="n">y_min</span><span class="p">,</span> <span class="n">sim_region</span><span class="o">.</span><span class="n">y_max</span><span class="p">,</span> <span class="n">n_y</span><span class="p">)</span>
+        <span class="c1"># initialise flag to indicate velocity field interpolators not set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interp_set</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_interpolators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set spline interpolators using current velocity fields.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interp_u</span> <span class="o">=</span> <span class="n">interp</span><span class="o">.</span><span class="n">RectBivariateSpline</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_points</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_points</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_u_int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interp_v</span> <span class="o">=</span> <span class="n">interp</span><span class="o">.</span><span class="n">RectBivariateSpline</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_points</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_points</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v_int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interp_set</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;1D array of the range of x-coordinates of simulated grid points.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_points</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;1D array of the range of y-coordinates of simulated grid points.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_points</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">velocity_field</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Current calculated velocity field across simulated grid points.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_u_int</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v_int</span><span class="p">))</span>
+
+<div class="viewcode-block" id="WindModel.velocity_at_pos"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.WindModel.velocity_at_pos">[docs]</a>    <span class="k">def</span> <span class="nf">velocity_at_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate velocity at a position or positions.</span>
+
+<span class="sd">        Calculates the components of the velocity field at arbitrary point(s)</span>
+<span class="sd">        in the simulation region using a bivariate spline interpolation over</span>
+<span class="sd">        the calculated grid point values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : float or array</span>
+<span class="sd">            x-coordinate of the point(s) to calculate the velocity at</span>
+<span class="sd">            (dimension: length).</span>
+<span class="sd">        y : float or array</span>
+<span class="sd">            y-coordinate of the point(s) to calculate the velocity at</span>
+<span class="sd">            (dimension: length).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        vel : array</span>
+<span class="sd">            Velocity field (2D) values evaluated at specified point(s)</span>
+<span class="sd">            (dimension: length / time).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interp_set</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_interpolators</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interp_u</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)),</span>
+                         <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interp_v</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))])</span></div>
+
+<div class="viewcode-block" id="WindModel.update"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.WindModel.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update wind velocity field by forward integrating one time-step.</span>
+
+<span class="sd">        Updates wind velocity field values using finite difference</span>
+<span class="sd">        approximations for spatial derivatives and Euler integration for</span>
+<span class="sd">        time-step update.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            Simulation time-step (dimension: time).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># update boundary values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_apply_boundary_conditions</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+        <span class="c1"># approximate spatial first derivatives with centred finite difference</span>
+        <span class="c1"># equations for both components of wind field</span>
+        <span class="n">du_dx</span><span class="p">,</span> <span class="n">du_dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centred_first_diffs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_u</span><span class="p">)</span>
+        <span class="n">dv_dx</span><span class="p">,</span> <span class="n">dv_dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centred_first_diffs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">)</span>
+        <span class="c1"># approximate spatial second derivatives with centred finite difference</span>
+        <span class="c1"># equations for both components of wind field</span>
+        <span class="n">d2u_dx2</span><span class="p">,</span> <span class="n">d2u_dy2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centred_second_diffs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_u</span><span class="p">)</span>
+        <span class="n">d2v_dx2</span><span class="p">,</span> <span class="n">d2v_dy2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centred_second_diffs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">)</span>
+        <span class="c1"># compute approximate time derivatives across simulation region</span>
+        <span class="c1"># interior from defining PDEs</span>
+        <span class="c1">#     du/dt = -(u*du/dx + v*du/dy) + 0.5*k_x*d2u/dx2 + 0.5*k_y*d2u/dy2</span>
+        <span class="c1">#     dv/dt = -(u*dv/dx + v*dv/dy) + 0.5*k_x*d2v/dx2 + 0.5*k_y*d2v/dy2</span>
+        <span class="n">du_dt</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_u_int</span> <span class="o">*</span> <span class="n">du_dx</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v_int</span> <span class="o">*</span> <span class="n">du_dy</span> <span class="o">+</span>
+                 <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_x</span> <span class="o">*</span> <span class="n">d2u_dx2</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_y</span> <span class="o">*</span> <span class="n">d2u_dy2</span><span class="p">)</span>
+        <span class="n">dv_dt</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_u_int</span> <span class="o">*</span> <span class="n">dv_dx</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v_int</span> <span class="o">*</span> <span class="n">dv_dy</span> <span class="o">+</span>
+                 <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_x</span> <span class="o">*</span> <span class="n">d2v_dx2</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_y</span> <span class="o">*</span> <span class="n">d2v_dy2</span><span class="p">)</span>
+        <span class="c1"># perform update with Euler integration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_u_int</span> <span class="o">+=</span> <span class="n">du_dt</span> <span class="o">*</span> <span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_v_int</span> <span class="o">+=</span> <span class="n">dv_dt</span> <span class="o">*</span> <span class="n">dt</span>
+        <span class="c1"># set flag to indicate interpolators no longer valid as fields updated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interp_set</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+    <span class="k">def</span> <span class="nf">_apply_boundary_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Applies boundary conditions to wind velocity field.&quot;&quot;&quot;</span>
+        <span class="c1"># update coloured noise generator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_gen</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+        <span class="c1"># extract four corner values for each of u and v fields as component</span>
+        <span class="c1"># mean plus current noise generator output</span>
+        <span class="p">(</span><span class="n">u_tl</span><span class="p">,</span> <span class="n">u_tr</span><span class="p">,</span> <span class="n">u_bl</span><span class="p">,</span> <span class="n">u_br</span><span class="p">,</span> <span class="n">v_tl</span><span class="p">,</span> <span class="n">v_tr</span><span class="p">,</span> <span class="n">v_bl</span><span class="p">,</span> <span class="n">v_br</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">noise_gen</span><span class="o">.</span><span class="n">output</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_corner_means</span><span class="p">)</span>
+        <span class="c1"># linearly interpolate along edges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_u</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u_tl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramp_x</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_tr</span> <span class="o">-</span> <span class="n">u_tl</span><span class="p">)</span>  <span class="c1"># u top edge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_u</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u_bl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramp_x</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_br</span> <span class="o">-</span> <span class="n">u_bl</span><span class="p">)</span>  <span class="c1"># u bottom edge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">u_tl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramp_y</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_bl</span> <span class="o">-</span> <span class="n">u_tl</span><span class="p">)</span>  <span class="c1"># u left edge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">u_tr</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramp_y</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_br</span> <span class="o">-</span> <span class="n">u_tr</span><span class="p">)</span>  <span class="c1"># u right edge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_tl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramp_x</span> <span class="o">*</span> <span class="p">(</span><span class="n">v_tr</span> <span class="o">-</span> <span class="n">v_tl</span><span class="p">)</span>  <span class="c1"># v top edge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_bl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramp_x</span> <span class="o">*</span> <span class="p">(</span><span class="n">v_br</span> <span class="o">-</span> <span class="n">v_bl</span><span class="p">)</span>  <span class="c1"># v bottom edge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">v_tl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramp_y</span> <span class="o">*</span> <span class="p">(</span><span class="n">v_bl</span> <span class="o">-</span> <span class="n">v_tl</span><span class="p">)</span>  <span class="c1"># v left edge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">v_tr</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramp_y</span> <span class="o">*</span> <span class="p">(</span><span class="n">v_br</span> <span class="o">-</span> <span class="n">v_tr</span><span class="p">)</span>  <span class="c1"># v right edge</span>
+
+    <span class="k">def</span> <span class="nf">_centred_first_diffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates centred first-order finite differences.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">((</span><span class="n">f</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">-</span> <span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_centred_second_diffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates centred second-order finite differences.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ColouredNoiseGenerator"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.ColouredNoiseGenerator">[docs]</a><span class="k">class</span> <span class="nc">ColouredNoiseGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generator of coloured (correlated) Gaussian noise process.</span>
+
+<span class="sd">    Generates a coloured noise output via numerical integration of a stochastic</span>
+<span class="sd">    differential equation formulation. The system is assumed to be defined by</span>
+<span class="sd">    the system of SDEs::</span>
+
+<span class="sd">        dx_0  = x_1 * dt</span>
+<span class="sd">        dx_1  = -(a * x_0 + b * x_1) * dt + c * dn</span>
+
+<span class="sd">    where `a = bandwidth**2` and `b = 2 * damping * bandwidth`,</span>
+<span class="sd">    `c = gain * bandwidth**2` and `dn` is a standard Gaussian white noise</span>
+<span class="sd">    process. This is numerically integrated using an Euler-Maruyama scheme::</span>
+
+<span class="sd">        for t in range(n_timestep):</span>
+<span class="sd">            x[t+1,0] = x[t,0] + dt * x[t,1]</span>
+<span class="sd">            x[t+1,1] = x[t,1] - dt * (a*x[t,0] + b*x[t,1]) + dt**0.5 * c * n[t]</span>
+
+<span class="sd">    where `x` is an array of shape `(n_timestep, 2)` and `n` is an array of</span>
+<span class="sd">    shape `(n_timestep)` filled with random standard normal draws.</span>
+
+<span class="sd">    This differs from the code accompanying Farrell et al. (2002) which applies</span>
+<span class="sd">    an Euler integration scheme to a state space formulation of a second-order</span>
+<span class="sd">    linear system with Gaussian noise input at each time step, resulting in</span>
+<span class="sd">    updates of the form::</span>
+
+<span class="sd">        for t in range(n_timestep):</span>
+<span class="sd">            x[t+1,0] = x[t,0] + dt * x[t,1]</span>
+<span class="sd">            x[t+1,1] = x[t,1] + dt * (-a * x[t,0] - b * x[t,1] + c * n[t])</span>
+
+<span class="sd">    This differs from the scheme implemented here by scaling the noise input</span>
+<span class="sd">    by the timestep `dt` rather than its square root `dt**0.5`. This introduces</span>
+<span class="sd">    an implicit dependence of the amplitude of the process on `dt`, in</span>
+<span class="sd">    particular that the amplitude scales roughly as `dt**0.5`.</span>
+
+<span class="sd">    Updates consistent with the Farrell et al. (2002) implementation can be</span>
+<span class="sd">    achieved by setting the `use_original_updates` flat to `True`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ColouredNoiseGenerator.__init__"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.ColouredNoiseGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_state</span><span class="p">,</span> <span class="n">damping</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">gain</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
+                 <span class="n">use_original_updates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        init_state : array_like</span>
+<span class="sd">            The initial state of system, must be of shape `(2,n)` where `n` is</span>
+<span class="sd">            the size of the noise vector to be produced. The first row</span>
+<span class="sd">            sets the initial values and the second the initial first</span>
+<span class="sd">            derivatives.</span>
+<span class="sd">        damping : float</span>
+<span class="sd">            Damping ratio for the system, affects system damping, values of</span>
+<span class="sd">            &lt; 1 give an underdamped system, = 1 a critically damped system and</span>
+<span class="sd">            &gt; 1 an overdamped system (dimensionless).</span>
+<span class="sd">        bandwidth : float</span>
+<span class="sd">            Bandwidth or equivalently undamped natural frequency of system,</span>
+<span class="sd">            affects system reponsiveness to variations in (noise) input</span>
+<span class="sd">            (dimension = 1 / time).</span>
+<span class="sd">        gain : float</span>
+<span class="sd">            Input gain of system, affects scaling of (noise) input.</span>
+<span class="sd">        rng : RandomState</span>
+<span class="sd">            Random number generator to use in generating input noise. Defaults</span>
+<span class="sd">            to `numpy.random` global generator if set to `None` however a</span>
+<span class="sd">            seeded `RandomState` object can be passed if it is desired to have</span>
+<span class="sd">            reproducible output.</span>
+<span class="sd">        use_original_updates : boolean</span>
+<span class="sd">            Whether to use the original non-SDE based updates for the noise</span>
+<span class="sd">            process as defined in Farrell et al. (2002), see above notes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span>
+        <span class="c1"># set up state space matrices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a_mtx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="n">bandwidth</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">damping</span> <span class="o">*</span> <span class="n">bandwidth</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b_mtx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.</span><span class="p">],</span> <span class="p">[</span><span class="n">gain</span> <span class="o">*</span> <span class="n">bandwidth</span><span class="o">**</span><span class="mi">2</span><span class="p">]])</span>
+        <span class="c1"># initialise state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">init_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">rng</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_original_updates</span> <span class="o">=</span> <span class="n">use_original_updates</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Coloured noise output.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+
+<div class="viewcode-block" id="ColouredNoiseGenerator.update"><a class="viewcode-back" href="../../pompy.models.html#pompy.models.ColouredNoiseGenerator.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update state of noise generator.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            Integrator time step.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get normal random input</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_original_updates</span><span class="p">:</span>
+            <span class="c1"># apply Farrell et al. (2002) update</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">+=</span> <span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a_mtx</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_mtx</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># apply update with Euler-Maruyama integration</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_mtx</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_mtx</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pompy 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Matt Graham.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.
+    </div>
+  </body>
+</html>

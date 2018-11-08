@@ -1,0 +1,7 @@
+pompy
+=====
+
+.. toctree::
+   :maxdepth: 4
+
+   pompy

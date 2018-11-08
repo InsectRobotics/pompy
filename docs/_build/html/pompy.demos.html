@@ -1,0 +1,249 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>demos module &#8212; pompy 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="processors module" href="pompy.processors.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pompy.processors.html" title="processors module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pompy 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-pompy.demos">
+<span id="demos-module"></span><h1><cite>demos</cite> module<a class="headerlink" href="#module-pompy.demos" title="Permalink to this headline">¶</a></h1>
+<p>Demonstrations of setting up models and visualising outputs.</p>
+<dl class="function">
+<dt id="pompy.demos.set_up_figure">
+<code class="descclassname">pompy.demos.</code><code class="descname">set_up_figure</code><span class="sig-paren">(</span><em>fig_size=(10</em>, <em>5)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/demos.html#set_up_figure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.demos.set_up_figure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up Matplotlib figure with simulation time title text.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>title_text</strong> (<em>string</em>) – Text to set figure title to.</li>
+<li><strong>fig_size</strong> (<em>tuple</em>) – Figure dimensions in inches in order <cite>(width, height)</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pompy.demos.update_decorator">
+<code class="descclassname">pompy.demos.</code><code class="descname">update_decorator</code><span class="sig-paren">(</span><em>dt</em>, <em>title</em>, <em>steps_per_frame</em>, <em>models</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/demos.html#update_decorator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.demos.update_decorator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator for animation update methods.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pompy.demos.wind_model_demo">
+<code class="descclassname">pompy.demos.</code><code class="descname">wind_model_demo</code><span class="sig-paren">(</span><em>dt=0.01</em>, <em>t_max=100</em>, <em>steps_per_frame=20</em>, <em>seed=20181108</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/demos.html#wind_model_demo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.demos.wind_model_demo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up wind model and animate velocity field with quiver plot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dt</strong> (<em>float</em>) – Simulation timestep.</li>
+<li><strong>t_max</strong> (<em>float</em>) – End time to simulate to.</li>
+<li><strong>steps_per_frame</strong> (<em>integer</em>) – Number of simulation time steps to perform between animation frames.</li>
+<li><strong>seed</strong> (<em>integer</em>) – Seed for random number generator.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>fig</strong> (<em>Figure</em>) – Matplotlib figure object.</li>
+<li><strong>ax</strong> (<em>AxesSubplot</em>) – Matplotlib axis object.</li>
+<li><strong>anim</strong> (<em>FuncAnimation</em>) – Matplotlib animation object.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pompy.demos.plume_model_demo">
+<code class="descclassname">pompy.demos.</code><code class="descname">plume_model_demo</code><span class="sig-paren">(</span><em>dt=0.01</em>, <em>t_max=100</em>, <em>steps_per_frame=200</em>, <em>seed=20181108</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/demos.html#plume_model_demo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.demos.plume_model_demo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up plume model and animate puffs overlayed over velocity field.</p>
+<p>Puff positions displayed using Matplotlib <cite>scatter</cite> plot function and
+velocity field displayed using <cite>quiver</cite> plot function.
+plot and quiver functions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dt</strong> (<em>float</em>) – Simulation timestep.</li>
+<li><strong>t_max</strong> (<em>float</em>) – End time to simulate to.</li>
+<li><strong>steps_per_frame</strong> (<em>integer</em>) – Number of simulation time steps to perform between animation frames.</li>
+<li><strong>seed</strong> (<em>integer</em>) – Seed for random number generator.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>fig</strong> (<em>Figure</em>) – Matplotlib figure object.</li>
+<li><strong>ax</strong> (<em>AxesSubplot</em>) – Matplotlib axis object.</li>
+<li><strong>anim</strong> (<em>FuncAnimation</em>) – Matplotlib animation object.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pompy.demos.conc_point_val_demo">
+<code class="descclassname">pompy.demos.</code><code class="descname">conc_point_val_demo</code><span class="sig-paren">(</span><em>dt=0.01</em>, <em>t_max=5</em>, <em>steps_per_frame=1</em>, <em>x=10.0</em>, <em>y=0.0</em>, <em>seed=20181108</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/demos.html#conc_point_val_demo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.demos.conc_point_val_demo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up plume model and animate concentration at a point as time series.</p>
+<p>Demonstration of setting up plume model and processing the outputted
+puff arrays with the ConcentrationPointValueCalculator class, the
+resulting concentration time course at a point in the odour plume being
+displayed with the Matplotlib <cite>plot</cite> function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dt</strong> (<em>float</em>) – Simulation timestep.</li>
+<li><strong>t_max</strong> (<em>float</em>) – End time to simulate to.</li>
+<li><strong>steps_per_frame</strong> (<em>integer</em>) – Number of simulation time steps to perform between animation frames.</li>
+<li><strong>x</strong> (<em>float</em>) – x-coordinate of point to measure concentration at.</li>
+<li><strong>y</strong> (<em>float</em>) – y-coordinate of point to measure concentration at.</li>
+<li><strong>seed</strong> (<em>integer</em>) – Seed for random number generator.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>fig</strong> (<em>Figure</em>) – Matplotlib figure object.</li>
+<li><strong>ax</strong> (<em>AxesSubplot</em>) – Matplotlib axis object.</li>
+<li><strong>anim</strong> (<em>FuncAnimation</em>) – Matplotlib animation object.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pompy.demos.concentration_array_demo">
+<code class="descclassname">pompy.demos.</code><code class="descname">concentration_array_demo</code><span class="sig-paren">(</span><em>dt=0.01</em>, <em>t_max=100</em>, <em>steps_per_frame=50</em>, <em>seed=20181108</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/demos.html#concentration_array_demo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.demos.concentration_array_demo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up plume model and animate concentration fields.</p>
+<p>Demonstration of setting up plume model and processing the outputted
+puff arrays with the <cite>ConcentrationArrayGenerator</cite> class, the resulting
+arrays being displayed with the Matplotlib <cite>imshow</cite> function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dt</strong> (<em>float</em>) – Simulation timestep.</li>
+<li><strong>t_max</strong> (<em>float</em>) – End time to simulate to.</li>
+<li><strong>steps_per_frame</strong> (<em>integer</em>) – Number of simulation time steps to perform between animation frames.</li>
+<li><strong>seed</strong> (<em>integer</em>) – Seed for random number generator.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>fig</strong> (<em>Figure</em>) – Matplotlib figure object.</li>
+<li><strong>ax</strong> (<em>AxesSubplot</em>) – Matplotlib axis object.</li>
+<li><strong>anim</strong> (<em>FuncAnimation</em>) – Matplotlib animation object.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pompy.processors.html"
+                        title="previous chapter"><cite>processors</cite> module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pompy.demos.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pompy.processors.html" title="processors module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pompy 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Matt Graham.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.
+    </div>
+  </body>
+</html>

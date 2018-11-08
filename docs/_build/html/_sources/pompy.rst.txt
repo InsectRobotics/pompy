@@ -1,0 +1,38 @@
+pompy package
+=============
+
+Submodules
+----------
+
+pompy.demos module
+------------------
+
+.. automodule:: pompy.demos
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pompy.models module
+-------------------
+
+.. automodule:: pompy.models
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pompy.processors module
+-----------------------
+
+.. automodule:: pompy.processors
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: pompy
+    :members:
+    :undoc-members:
+    :show-inheritance:

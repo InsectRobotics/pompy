@@ -1,0 +1,720 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>pompy package &#8212; pompy 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="pompy-package">
+<h1>pompy package<a class="headerlink" href="#pompy-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pompy.demos">
+<span id="pompy-demos-module"></span><h2>pompy.demos module<a class="headerlink" href="#module-pompy.demos" title="Permalink to this headline">¶</a></h2>
+<p>Demonstrations of setting up models and visualising outputs.</p>
+<dl class="function">
+<dt id="pompy.demos.conc_point_val_demo">
+<code class="descclassname">pompy.demos.</code><code class="descname">conc_point_val_demo</code><span class="sig-paren">(</span><em>dt=0.01</em>, <em>t_max=5</em>, <em>steps_per_frame=1</em>, <em>x=10.0</em>, <em>y=0.0</em>, <em>seed=20181108</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/demos.html#conc_point_val_demo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.demos.conc_point_val_demo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up plume model and animate concentration at a point as time series.</p>
+<p>Demonstration of setting up plume model and processing the outputted
+puff arrays with the ConcentrationPointValueCalculator class, the
+resulting concentration time course at a point in the odour plume being
+displayed with the Matplotlib <cite>plot</cite> function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dt</strong> (<em>float</em>) – Simulation timestep.</li>
+<li><strong>t_max</strong> (<em>float</em>) – End time to simulate to.</li>
+<li><strong>steps_per_frame</strong> (<em>integer</em>) – Number of simulation time steps to perform between animation frames.</li>
+<li><strong>x</strong> (<em>float</em>) – x-coordinate of point to measure concentration at.</li>
+<li><strong>y</strong> (<em>float</em>) – y-coordinate of point to measure concentration at.</li>
+<li><strong>seed</strong> (<em>integer</em>) – Seed for random number generator.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>fig</strong> (<em>Figure</em>) – Matplotlib figure object.</li>
+<li><strong>ax</strong> (<em>AxesSubplot</em>) – Matplotlib axis object.</li>
+<li><strong>anim</strong> (<em>FuncAnimation</em>) – Matplotlib animation object.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pompy.demos.concentration_array_demo">
+<code class="descclassname">pompy.demos.</code><code class="descname">concentration_array_demo</code><span class="sig-paren">(</span><em>dt=0.01</em>, <em>t_max=100</em>, <em>steps_per_frame=50</em>, <em>seed=20181108</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/demos.html#concentration_array_demo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.demos.concentration_array_demo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up plume model and animate concentration fields.</p>
+<p>Demonstration of setting up plume model and processing the outputted
+puff arrays with the <cite>ConcentrationArrayGenerator</cite> class, the resulting
+arrays being displayed with the Matplotlib <cite>imshow</cite> function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dt</strong> (<em>float</em>) – Simulation timestep.</li>
+<li><strong>t_max</strong> (<em>float</em>) – End time to simulate to.</li>
+<li><strong>steps_per_frame</strong> (<em>integer</em>) – Number of simulation time steps to perform between animation frames.</li>
+<li><strong>seed</strong> (<em>integer</em>) – Seed for random number generator.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>fig</strong> (<em>Figure</em>) – Matplotlib figure object.</li>
+<li><strong>ax</strong> (<em>AxesSubplot</em>) – Matplotlib axis object.</li>
+<li><strong>anim</strong> (<em>FuncAnimation</em>) – Matplotlib animation object.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pompy.demos.plume_model_demo">
+<code class="descclassname">pompy.demos.</code><code class="descname">plume_model_demo</code><span class="sig-paren">(</span><em>dt=0.01</em>, <em>t_max=100</em>, <em>steps_per_frame=200</em>, <em>seed=20181108</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/demos.html#plume_model_demo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.demos.plume_model_demo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up plume model and animate puffs overlayed over velocity field.</p>
+<p>Puff positions displayed using Matplotlib <cite>scatter</cite> plot function and
+velocity field displayed using <cite>quiver</cite> plot function.
+plot and quiver functions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dt</strong> (<em>float</em>) – Simulation timestep.</li>
+<li><strong>t_max</strong> (<em>float</em>) – End time to simulate to.</li>
+<li><strong>steps_per_frame</strong> (<em>integer</em>) – Number of simulation time steps to perform between animation frames.</li>
+<li><strong>seed</strong> (<em>integer</em>) – Seed for random number generator.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>fig</strong> (<em>Figure</em>) – Matplotlib figure object.</li>
+<li><strong>ax</strong> (<em>AxesSubplot</em>) – Matplotlib axis object.</li>
+<li><strong>anim</strong> (<em>FuncAnimation</em>) – Matplotlib animation object.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pompy.demos.set_up_figure">
+<code class="descclassname">pompy.demos.</code><code class="descname">set_up_figure</code><span class="sig-paren">(</span><em>fig_size=(10</em>, <em>5)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/demos.html#set_up_figure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.demos.set_up_figure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up Matplotlib figure with simulation time title text.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>title_text</strong> (<em>string</em>) – Text to set figure title to.</li>
+<li><strong>fig_size</strong> (<em>tuple</em>) – Figure dimensions in inches in order <cite>(width, height)</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pompy.demos.update_decorator">
+<code class="descclassname">pompy.demos.</code><code class="descname">update_decorator</code><span class="sig-paren">(</span><em>dt</em>, <em>title</em>, <em>steps_per_frame</em>, <em>models</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/demos.html#update_decorator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.demos.update_decorator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator for animation update methods.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pompy.demos.wind_model_demo">
+<code class="descclassname">pompy.demos.</code><code class="descname">wind_model_demo</code><span class="sig-paren">(</span><em>dt=0.01</em>, <em>t_max=100</em>, <em>steps_per_frame=20</em>, <em>seed=20181108</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/demos.html#wind_model_demo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.demos.wind_model_demo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up wind model and animate velocity field with quiver plot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dt</strong> (<em>float</em>) – Simulation timestep.</li>
+<li><strong>t_max</strong> (<em>float</em>) – End time to simulate to.</li>
+<li><strong>steps_per_frame</strong> (<em>integer</em>) – Number of simulation time steps to perform between animation frames.</li>
+<li><strong>seed</strong> (<em>integer</em>) – Seed for random number generator.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>fig</strong> (<em>Figure</em>) – Matplotlib figure object.</li>
+<li><strong>ax</strong> (<em>AxesSubplot</em>) – Matplotlib axis object.</li>
+<li><strong>anim</strong> (<em>FuncAnimation</em>) – Matplotlib animation object.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pompy.models">
+<span id="pompy-models-module"></span><h2>pompy.models module<a class="headerlink" href="#module-pompy.models" title="Permalink to this headline">¶</a></h2>
+<p>Implementations of puff-based plume model components.</p>
+<dl class="class">
+<dt id="pompy.models.ColouredNoiseGenerator">
+<em class="property">class </em><code class="descclassname">pompy.models.</code><code class="descname">ColouredNoiseGenerator</code><span class="sig-paren">(</span><em>init_state</em>, <em>damping=0.1</em>, <em>bandwidth=0.2</em>, <em>gain=1.0</em>, <em>use_original_updates=False</em>, <em>rng=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/models.html#ColouredNoiseGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.models.ColouredNoiseGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Generator of coloured (correlated) Gaussian noise process.</p>
+<p>Generates a coloured noise output via numerical integration of a stochastic
+differential equation formulation. The system is assumed to be defined by
+the system of SDEs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dx_0</span>  <span class="o">=</span> <span class="n">x_1</span> <span class="o">*</span> <span class="n">dt</span>
+<span class="n">dx_1</span>  <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">x_0</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">x_1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">dn</span>
+</pre></div>
+</div>
+<p>where <cite>a = bandwidth**2</cite> and <cite>b = 2 * damping * bandwidth</cite>,
+<cite>c = gain * bandwidth**2</cite> and <cite>dn</cite> is a standard Gaussian white noise
+process. This is numerically integrated using an Euler-Maruyama scheme:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_timestep</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">dt</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="n">n</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>where <cite>x</cite> is an array of shape <cite>(n_timestep, 2)</cite> and <cite>n</cite> is an array of
+shape <cite>(n_timestep)</cite> filled with random standard normal draws.</p>
+<p>This differs from the code accompanying Farrell et al. (2002) which applies
+an Euler integration scheme to a state space formulation of a second-order
+linear system with Gaussian noise input at each time step, resulting in
+updates of the form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_timestep</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">a</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">b</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">n</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>This differs from the scheme implemented here by scaling the noise input
+by the timestep <cite>dt</cite> rather than its square root <cite>dt**0.5</cite>. This introduces
+an implicit dependence of the amplitude of the process on <cite>dt</cite>, in
+particular that the amplitude scales roughly as <cite>dt**0.5</cite>.</p>
+<p>Updates consistent with the Farrell et al. (2002) implementation can be
+achieved by setting the <cite>use_original_updates</cite> flat to <cite>True</cite>.</p>
+<dl class="attribute">
+<dt id="pompy.models.ColouredNoiseGenerator.output">
+<code class="descname">output</code><a class="headerlink" href="#pompy.models.ColouredNoiseGenerator.output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coloured noise output.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pompy.models.ColouredNoiseGenerator.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/models.html#ColouredNoiseGenerator.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.models.ColouredNoiseGenerator.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update state of noise generator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dt</strong> (<em>float</em>) – Integrator time step.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pompy.models.PlumeModel">
+<em class="property">class </em><code class="descclassname">pompy.models.</code><code class="descname">PlumeModel</code><span class="sig-paren">(</span><em>sim_region=None</em>, <em>source_pos=(5.0</em>, <em>0.0</em>, <em>0.0)</em>, <em>wind_model=None</em>, <em>model_z_disp=True</em>, <em>centre_rel_diff_scale=2.0</em>, <em>puff_init_rad=0.0316</em>, <em>puff_spread_rate=0.001</em>, <em>puff_release_rate=10</em>, <em>init_num_puffs=10</em>, <em>max_num_puffs=1000</em>, <em>rng=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/models.html#PlumeModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.models.PlumeModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Puff-based odour plume dispersion model from Farrell et. al. (2002).</p>
+<p>The odour plume is modelled as a series of odour puffs which are released
+from a fixed source position. The odour puffs are dispersed by a modelled
+2D wind velocity field plus a white noise process model of mid-scale puff
+mass diffusion relative to the plume centre line. The puffs also spread in
+size over time to model fine-scale diffusive processes.</p>
+<dl class="attribute">
+<dt id="pompy.models.PlumeModel.puff_array">
+<code class="descname">puff_array</code><a class="headerlink" href="#pompy.models.PlumeModel.puff_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>NumPy array of the properties of the simulated puffs.</p>
+<p>Each row corresponds to one puff with the first column containing the
+puff position x-coordinate, the second the y-coordinate, the third the
+z-coordinate and the fourth the puff squared radius.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pompy.models.PlumeModel.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/models.html#PlumeModel.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.models.PlumeModel.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update plume puff objects by forward intgating one time-step.</p>
+<p>Performs a single time-step update of plume model using Euler
+integration scheme.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dt</strong> (<em>float</em>) – Simulation time-step (dimension: time).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pompy.models.Puff">
+<em class="property">class </em><code class="descclassname">pompy.models.</code><code class="descname">Puff</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>r_sq</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/models.html#Puff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.models.Puff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pompy.models.SlottedIterable" title="pompy.models.SlottedIterable"><code class="xref py py-class docutils literal notranslate"><span class="pre">pompy.models.SlottedIterable</span></code></a></p>
+<p>Container for the properties of a single odour puff.</p>
+<dl class="attribute">
+<dt id="pompy.models.Puff.r_sq">
+<code class="descname">r_sq</code><a class="headerlink" href="#pompy.models.Puff.r_sq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pompy.models.Puff.x">
+<code class="descname">x</code><a class="headerlink" href="#pompy.models.Puff.x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pompy.models.Puff.y">
+<code class="descname">y</code><a class="headerlink" href="#pompy.models.Puff.y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pompy.models.Puff.z">
+<code class="descname">z</code><a class="headerlink" href="#pompy.models.Puff.z" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pompy.models.Rectangle">
+<em class="property">class </em><code class="descclassname">pompy.models.</code><code class="descname">Rectangle</code><span class="sig-paren">(</span><em>x_min</em>, <em>x_max</em>, <em>y_min</em>, <em>y_max</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/models.html#Rectangle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.models.Rectangle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pompy.models.SlottedIterable" title="pompy.models.SlottedIterable"><code class="xref py py-class docutils literal notranslate"><span class="pre">pompy.models.SlottedIterable</span></code></a></p>
+<p>Axis-aligned rectangular region.</p>
+<p>Rectangle is defined by two points (x_min, y_min) and (x_max, y_max) with
+it required that x_max &gt; x_min and y_max &gt; y_min.</p>
+<dl class="method">
+<dt id="pompy.models.Rectangle.contains">
+<code class="descname">contains</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/models.html#Rectangle.contains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.models.Rectangle.contains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether (x, y) position is contained within this rectangle.</p>
+<p>Tests whether the supplied position, an (x,y) pair, is contained within
+the region defined by this Rectangle object and returns True if so and
+False if not.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>float</em>) – x-coordinate of position to test.</li>
+<li><strong>y</strong> (<em>float</em>) – y-coordinate of position to test.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>contains</strong> – <cite>True</cite> if <cite>(x, y)</cite> is within the rectangle and <cite>False</cite> otherwise.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">boolean</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pompy.models.Rectangle.h">
+<code class="descname">h</code><a class="headerlink" href="#pompy.models.Rectangle.h" title="Permalink to this definition">¶</a></dt>
+<dd><p>Height of rectangle (i.e. distance covered on y-axis).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pompy.models.Rectangle.w">
+<code class="descname">w</code><a class="headerlink" href="#pompy.models.Rectangle.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>Width of rectangle (i.e. distance covered on x-axis).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pompy.models.Rectangle.x_max">
+<code class="descname">x_max</code><a class="headerlink" href="#pompy.models.Rectangle.x_max" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pompy.models.Rectangle.x_min">
+<code class="descname">x_min</code><a class="headerlink" href="#pompy.models.Rectangle.x_min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pompy.models.Rectangle.y_max">
+<code class="descname">y_max</code><a class="headerlink" href="#pompy.models.Rectangle.y_max" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pompy.models.Rectangle.y_min">
+<code class="descname">y_min</code><a class="headerlink" href="#pompy.models.Rectangle.y_min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pompy.models.SlottedIterable">
+<em class="property">class </em><code class="descclassname">pompy.models.</code><code class="descname">SlottedIterable</code><a class="reference internal" href="_modules/pompy/models.html#SlottedIterable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.models.SlottedIterable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for objects with slots which can be used as iterables.</p>
+<p>Allows instances of subclasses to be used as iterables and provides a
+human-readable string representation.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pompy.models.WindModel">
+<em class="property">class </em><code class="descclassname">pompy.models.</code><code class="descname">WindModel</code><span class="sig-paren">(</span><em>sim_region=None</em>, <em>n_x=21</em>, <em>n_y=21</em>, <em>u_av=1.0</em>, <em>v_av=0.0</em>, <em>k_x=20.0</em>, <em>k_y=20.0</em>, <em>noise_gain=2.0</em>, <em>noise_damp=0.1</em>, <em>noise_bandwidth=0.2</em>, <em>use_original_noise_updates=False</em>, <em>rng=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/models.html#WindModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.models.WindModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Wind velocity model to calculate advective transport of odour.</p>
+<p>A 2D approximation is used as described in the paper, with the wind
+velocities calculated over a regular 2D grid of points using a finite
+difference method. The boundary conditions at the edges of the simulated
+region are for both components of the velocity field constant mean values
+plus coloured noise. For each of the field components these are calculated
+for the four corners of the simulated region and then linearly interpolated
+over the edges.</p>
+<dl class="method">
+<dt id="pompy.models.WindModel.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/models.html#WindModel.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.models.WindModel.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update wind velocity field by forward integrating one time-step.</p>
+<p>Updates wind velocity field values using finite difference
+approximations for spatial derivatives and Euler integration for
+time-step update.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dt</strong> (<em>float</em>) – Simulation time-step (dimension: time).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pompy.models.WindModel.velocity_at_pos">
+<code class="descname">velocity_at_pos</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/models.html#WindModel.velocity_at_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.models.WindModel.velocity_at_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate velocity at a position or positions.</p>
+<p>Calculates the components of the velocity field at arbitrary point(s)
+in the simulation region using a bivariate spline interpolation over
+the calculated grid point values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>float</em><em> or </em><em>array</em>) – x-coordinate of the point(s) to calculate the velocity at
+(dimension: length).</li>
+<li><strong>y</strong> (<em>float</em><em> or </em><em>array</em>) – y-coordinate of the point(s) to calculate the velocity at
+(dimension: length).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>vel</strong> – Velocity field (2D) values evaluated at specified point(s)
+(dimension: length / time).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pompy.models.WindModel.velocity_field">
+<code class="descname">velocity_field</code><a class="headerlink" href="#pompy.models.WindModel.velocity_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Current calculated velocity field across simulated grid points.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pompy.models.WindModel.x_points">
+<code class="descname">x_points</code><a class="headerlink" href="#pompy.models.WindModel.x_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>1D array of the range of x-coordinates of simulated grid points.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pompy.models.WindModel.y_points">
+<code class="descname">y_points</code><a class="headerlink" href="#pompy.models.WindModel.y_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>1D array of the range of y-coordinates of simulated grid points.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pompy.processors">
+<span id="pompy-processors-module"></span><h2>pompy.processors module<a class="headerlink" href="#module-pompy.processors" title="Permalink to this headline">¶</a></h2>
+<p>Helper classes to process outputs of models.</p>
+<dl class="class">
+<dt id="pompy.processors.ConcentrationArrayGenerator">
+<em class="property">class </em><code class="descclassname">pompy.processors.</code><code class="descname">ConcentrationArrayGenerator</code><span class="sig-paren">(</span><em>array_xy_region</em>, <em>array_z</em>, <em>n_x</em>, <em>n_y</em>, <em>puff_mol_amount</em>, <em>kernel_rad_mult=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/processors.html#ConcentrationArrayGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.processors.ConcentrationArrayGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Produces odour concentration field arrays from puff property arrays.</p>
+<p>Instances of this class can take single or multiple arrays of puff
+properties outputted from a <cite>PlumeModel</cite> and process them to produce an
+array of the concentration values across the a specified region using
+a Gaussian model for the individual puff concentration distributions.</p>
+<p>Compared to the <cite>ConcentrationValueCalculator</cite> class, this class should be
+more efficient for calculating large concentration field arrays for
+real-time graphical display of odour concentration fields for example
+at the expense of  less accurate values due to the truncation of spatial
+extent of each puff.</p>
+<p class="rubric">Notes</p>
+<p>The returned array values correspond to the point concentration
+measurements across a regular grid of sampling points - i.e. the
+equivalent to convolving the true continuous concentration distribution
+with a regular 2D grid of Dirac delta / impulse functions. An improvement
+in some ways would be to instead calculate the integral of the
+concentration distribution over the (square) region around each grid point
+however this would be extremely computationally costly and due to the lack
+of a closed form solution for the integral of a Gaussian also potentially
+difficult to implement without introducing other numerical errors. An
+integrated field can be approximated with this class by generating an
+array at a higher resolution than required and then filtering with a
+suitable kernel and down-sampling.</p>
+<p>This implementation estimates the concentration distribution puff kernels
+with sub-grid resolution, giving improved accuracy at the cost of
+increased computational cost versus using a precomputed radial field
+aligned with the grid to compute kernel values or using a library of
+precomputed kernels.</p>
+<p>For cases where the array region cover the whole simulation region the
+computational cost could also be reduced by increasing the size of the
+region the array corresponds to outside of the simulation region such that
+when adding the puff concentration kernels to the concentration field
+array, checks do not need to be made to restrict to the overlapping region
+for puffs near the edges of the simulation region which have a
+concentration distribution which extends beyond its extents.</p>
+<dl class="method">
+<dt id="pompy.processors.ConcentrationArrayGenerator.generate_multiple_arrays">
+<code class="descname">generate_multiple_arrays</code><span class="sig-paren">(</span><em>puff_arrays</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/processors.html#ConcentrationArrayGenerator.generate_multiple_arrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.processors.ConcentrationArrayGenerator.generate_multiple_arrays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates multiple concentration field arrays from puff arrays.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>puff_arrays</strong> (<em>array iterable</em>) – Iterable sequence of 2D arrays of puff properties, with each array
+of shape <cite>(n_puffs, 4)</cite> with <cite>n_puffs</cite> being the number of puffs
+and the four columns of the array corresponding in order to the
+puff x-coordinates, y-coordinates, z-coordinates and squared radii.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>conc_arrays</strong> – List of 2D arrays of shape <cite>(n_x, n_y)</cite> containing concentration
+field values at specified grid points, with each array in list
+corresponding to the puff properties array at the corresponding
+index in <cite>puff_arrays</cite>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">array iterable</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pompy.processors.ConcentrationArrayGenerator.generate_single_array">
+<code class="descname">generate_single_array</code><span class="sig-paren">(</span><em>puff_array</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/processors.html#ConcentrationArrayGenerator.generate_single_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.processors.ConcentrationArrayGenerator.generate_single_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a single concentration field array from a puff array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>puff_array</strong> (<em>array</em>) – 2D array of puff properties of shape <cite>(n_puffs, 4)</cite> with <cite>n_puffs</cite>
+being the number of puffs and the four columns of the array
+corresponding in order to the puff x-coordinates, y-coordinates,
+z-coordinates and squared radii.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>conc_array</strong> – 2D array of shape <cite>(n_x, n_y)</cite> containing concentration field
+values at specified grid points.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pompy.processors.ConcentrationValueCalculator">
+<em class="property">class </em><code class="descclassname">pompy.processors.</code><code class="descname">ConcentrationValueCalculator</code><span class="sig-paren">(</span><em>puff_molecular_amount</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/processors.html#ConcentrationValueCalculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.processors.ConcentrationValueCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Calculates odour concentration values in simulation region.</p>
+<dl class="method">
+<dt id="pompy.processors.ConcentrationValueCalculator.calc_conc_grid">
+<code class="descname">calc_conc_grid</code><span class="sig-paren">(</span><em>puff_array</em>, <em>x</em>, <em>y</em>, <em>z=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/processors.html#ConcentrationValueCalculator.calc_conc_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.processors.ConcentrationValueCalculator.calc_conc_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate concentrations across a 2D grid of points in a xy-plane.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>puff_array</strong> (<em>array</em>) – 2D array of puff properties of shape <cite>(n_puffs, 4)</cite> with <cite>n_puffs</cite>
+being the number of puffs and the four columns of the array
+corresponding in order to the puff x-coordinates, y-coordinates,
+z-coordinates and squared radii.</li>
+<li><strong>x</strong> (<em>array</em>) – 2D array of x-coordinates of grid points.</li>
+<li><strong>y</strong> (<em>array</em>) – 2D array  of y-coordinates of grid points.</li>
+<li><strong>z</strong> (<em>float</em>) – z-coordinate (height) of grid plane.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pompy.processors.ConcentrationValueCalculator.calc_conc_list">
+<code class="descname">calc_conc_list</code><span class="sig-paren">(</span><em>puff_array</em>, <em>x</em>, <em>y</em>, <em>z=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/processors.html#ConcentrationValueCalculator.calc_conc_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.processors.ConcentrationValueCalculator.calc_conc_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate concentrations across a 1D list of points in a xy-plane.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>puff_array</strong> (<em>array</em>) – 2D array of puff properties of shape <cite>(n_puffs, 4)</cite> with <cite>n_puffs</cite>
+being the number of puffs and the four columns of the array
+corresponding in order to the puff x-coordinates, y-coordinates,
+z-coordinates and squared radii.</li>
+<li><strong>x</strong> (<em>array</em>) – 1D array of x-coordinates of points.</li>
+<li><strong>y</strong> (<em>array</em>) – 1D array of y-coordinates of points.</li>
+<li><strong>z</strong> (<em>float</em>) – z-coordinate (height) of plane.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pompy.processors.ConcentrationValueCalculator.calc_conc_point">
+<code class="descname">calc_conc_point</code><span class="sig-paren">(</span><em>puff_array</em>, <em>x</em>, <em>y</em>, <em>z=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pompy/processors.html#ConcentrationValueCalculator.calc_conc_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pompy.processors.ConcentrationValueCalculator.calc_conc_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate concentration at a single point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>puff_array</strong> (<em>array</em>) – 2D array of puff properties of shape <cite>(n_puffs, 4)</cite> with <cite>n_puffs</cite>
+being the number of puffs and the four columns of the array
+corresponding in order to the puff x-coordinates, y-coordinates,
+z-coordinates and squared radii.</li>
+<li><strong>x</strong> (<em>float</em>) – x-coordinate of point.</li>
+<li><strong>y</strong> (<em>float</em>) – y-coordinate of point.</li>
+<li><strong>z</strong> (<em>float</em>) – z-coordinate of point.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pompy">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pompy" title="Permalink to this headline">¶</a></h2>
+<p>pompy - Puff Odour-plume Model in PYthon.</p>
+<p>Implementation of puff-based odour dispersion model in Farrell et. al. (2002).</p>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li>Farrell, J.A., Murlis, J., Long, X., Li, W. and Cardé, R.T., 2002.
+Filament-based atmospheric dispersion model to achieve short time-scale
+structure of odor plumes. Environmental fluid mechanics, 2(1-2), pp.143-169.</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">pompy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Matt Graham.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/pompy.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
