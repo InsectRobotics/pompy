@@ -17,7 +17,7 @@ class ConcentrationValueCalculator(object):
         """
         Parameters
         ----------
-        puff_mol_amount : float
+        puff_molecular_amount : float
             Molecular content of each puff (e.g. in moles or raw number of
             molecules). This is conserved as the puff is transported within
             the plume but the puff becomes increasingly diffuse as it's radius

@@ -61,8 +61,8 @@ class Puff(SlottedIterable):
 class Rectangle(SlottedIterable):
     """Axis-aligned rectangular region.
 
-    Rectangle is defined by two points (x_min, y_min) and (x_max, y_max) with
-    it required that x_max > x_min and y_max > y_min.
+    Rectangle is defined by two points `(x_min, y_min)` and `(x_max, y_max)`
+    with it required that `x_max > x_min` and `y_max > y_min`.
     """
 
     __slots__ = ('x_min', 'x_max', 'y_min', 'y_max')
@@ -98,11 +98,11 @@ class Rectangle(SlottedIterable):
         return self.y_max - self.y_min
 
     def contains(self, x, y):
-        """Whether (x, y) position is contained within this rectangle.
+        """Whether `(x, y)`` position is contained within this rectangle.
 
-        Tests whether the supplied position, an (x,y) pair, is contained within
-        the region defined by this Rectangle object and returns True if so and
-        False if not.
+        Tests whether the supplied position, an `(x,y)` pair, is contained
+        within the region defined by this `Rectangle` object and returns `True`
+        if so and `False` if not.
 
         Parameters
         ----------
@@ -132,9 +132,9 @@ class PlumeModel(object):
 
     def __init__(self, sim_region=None, source_pos=(5., 0., 0.),
                  wind_model=None, model_z_disp=True, centre_rel_diff_scale=2.,
-                 puff_init_rad=0.001**0.5, puff_spread_rate=0.001,
+                 puff_init_rad=0.0316, puff_spread_rate=0.001,
                  puff_release_rate=10, init_num_puffs=10, max_num_puffs=1000,
-                 rng=np.random):
+                 rng=None):
         """
         Parameters
         ----------
@@ -186,12 +186,15 @@ class PlumeModel(object):
             will lead to breaks in puff release when the number of puffs
             remaining in the simulation region reaches the limit.
         rng : RandomState
-            Random number generator to use in generating noise values. Defaults
-            to `numpy.random` global generator however a seeded `RandomState`
-            object can be passed if it is desired to have reproducible output.
+            Random number generator to use in generating input noise. Defaults
+            to `numpy.random` global generator if set to `None` however a
+            seeded `RandomState` object can be passed if it is desired to have
+            reproducible output.
         """
         if sim_region is None:
             sim_region = Rectangle(0., 50., -12.5, 12.5)
+        if rng is None:
+            rng = np.random
         self.sim_region = sim_region
         if wind_model is None:
             wind_model = WindModel()
@@ -292,7 +295,7 @@ class WindModel(object):
     def __init__(self, sim_region=None, n_x=21, n_y=21, u_av=1., v_av=0.,
                  k_x=20., k_y=20., noise_gain=2., noise_damp=0.1,
                  noise_bandwidth=0.2, use_original_noise_updates=False,
-                 rng=np.random):
+                 rng=None):
         """
         Parameters
         ----------
@@ -330,11 +333,14 @@ class WindModel(object):
             `ColouredNoiseGenerator` documentation.
         rng : RandomState
             Random number generator to use in generating input noise. Defaults
-            to `numpy.random` global generator however a seeded `RandomState`
-            object can be passed if it is desired to have reproducible output.
+            to `numpy.random` global generator if set to `None` however a
+            seeded `RandomState` object can be passed if it is desired to have
+            reproducible output.
         """
         if sim_region is None:
             sim_region = Rectangle(0, 100, -50, 50)
+        if rng is None:
+            rng = np.random
         self.sim_region = sim_region
         self.u_av = u_av
         self.v_av = v_av
@@ -529,7 +535,7 @@ class ColouredNoiseGenerator(object):
     """
 
     def __init__(self, init_state, damping=0.1, bandwidth=0.2, gain=1.,
-                 use_original_updates=False,  rng=np.random):
+                 use_original_updates=False,  rng=None):
         """
         Parameters
         ----------
@@ -550,12 +556,15 @@ class ColouredNoiseGenerator(object):
             Input gain of system, affects scaling of (noise) input.
         rng : RandomState
             Random number generator to use in generating input noise. Defaults
-            to `numpy.random` global generator however a seeded `RandomState`
-            object can be passed if it is desired to have reproducible output.
+            to `numpy.random` global generator if set to `None` however a
+            seeded `RandomState` object can be passed if it is desired to have
+            reproducible output.
         use_original_updates : boolean
             Whether to use the original non-SDE based updates for the noise
             process as defined in Farrell et al. (2002), see above notes.
         """
+        if rng is None:
+            rng = np.random
         # set up state space matrices
         self.a_mtx = np.array([
             [0., 1.], [-bandwidth**2, -2. * damping * bandwidth]])
