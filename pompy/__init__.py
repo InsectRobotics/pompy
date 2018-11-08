@@ -6,8 +6,8 @@ Implementation of puff-based odour dispersion model in Farrell et. al. (2002).
 References
 ----------
 
-1. Farrell, J.A., Murlis, J., Long, X., Li, W. and Cardé, R.T., 2002. 
-   Filament-based atmospheric dispersion model to achieve short time-scale 
+1. Farrell, J.A., Murlis, J., Long, X., Li, W. and Cardé, R.T., 2002.
+   Filament-based atmospheric dispersion model to achieve short time-scale
    structure of odor plumes. Environmental fluid mechanics, 2(1-2), pp.143-169.
 
 """
