@@ -1,5 +1,7 @@
 ## `pompy` - *p*uff-based *o*dour plume *m*odel in *Py*thon
 
+[![Documentation Status](https://readthedocs.org/projects/pompy-docs/badge/?version=latest)](https://pompy-docs.readthedocs.io/en/latest/?badge=latest)
+
 `pompy` is a NumPy based implementation of the puff-based odour plume model described in [*Filament-Based Atmospheric Dispersion Model to Achieve Short Time-Scale Structure of Odor Plumes*](http://link.springer.com/article/10.1023%2FA%3A1016283702837#page-1) by Farrell et al. (2002).
 
 ![Plume model animation](plume.gif "Plume model animation example.")
@@ -25,6 +27,8 @@ pip install -r requirements.txt
 ```
 
 ### Documentation
+
+Documentation of the `pompy` API is available at [Read the Docs](https://pompy-docs.readthedocs.io/en/latest/).
 
 Two Jupyter notebooks showing examples of using the package are included in the repository root directory. The [`Farrell et al. (2002) example.ipynb`](Farrell%20et%20al.%20%282002%29%20example.ipynb) notebook file illustrates an example of using the `pompy` package to generate an animation of an odour plume using the simulation parameters described in Farrell et al. (2002) and includes keys to match the symbols used to define the parameter in the paper with the relevant `pompy` class attributes. The [`Demonstration.ipynb`](Demonstrations.ipynb) and accompanying module `pompy.demos` give several other examples of setting up plume models using `pompy` and visualising the simulations.
 
