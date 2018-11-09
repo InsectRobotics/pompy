@@ -1,5 +1,5 @@
-`processors` module
-===================
+`pompy.processors` module
+=========================
 
 .. automodule:: pompy.processors
     :members:

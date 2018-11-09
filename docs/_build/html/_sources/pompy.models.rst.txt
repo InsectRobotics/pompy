@@ -1,5 +1,5 @@
-`models` module
-===============
+`pompy.models` module
+=====================
 
 .. automodule:: pompy.models
     :members:

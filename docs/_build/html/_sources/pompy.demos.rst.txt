@@ -1,5 +1,5 @@
-`demos` module
-==============
+`pompy.demos` module
+====================
 
 .. automodule:: pompy.demos
     :members:
