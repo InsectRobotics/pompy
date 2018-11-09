@@ -1,6 +1,6 @@
 ## PomPy - *p*uff-based *o*dour plume *m*odel in *Py*thon
 
-[![PyPI version](https://badge.fury.io/py/pompy.svg)](https://badge.fury.io/py/pompy)   
+[![PyPI version](https://badge.fury.io/py/pompy.svg)](https://badge.fury.io/py/pompy)
 [![Documentation Status](https://readthedocs.org/projects/pompy-docs/badge/?version=latest)](https://pompy-docs.readthedocs.io/en/latest/?badge=latest)
 [![DOI](https://zenodo.org/badge/46521199.svg)](https://zenodo.org/badge/latestdoi/46521199)
 
