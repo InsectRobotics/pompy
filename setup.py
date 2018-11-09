@@ -2,11 +2,40 @@
 """Setup script for pompy package."""
 
 from setuptools import setup
+from os import path
+from io import open
 
-if __name__ == '__main__':
-    setup(name='pompy',
-          description='Puff-based odour plume model',
-          author='Matt Graham',
-          url='https://github.com/InsectRobotics/pompy',
-          packages=['pompy'])
 
+here = path.abspath(path.dirname(__file__))
+
+with open(path.join(here, 'docs', 'description.rst'), encoding='utf-8') as fh:
+    long_description = fh.read()
+
+setup(
+    name='pompy',
+    version='0.1.0',
+    description='Puff-based odour plume model',
+    long_description=long_description,
+    long_description_content_type='text/x-rst',
+    author='Matt Graham',
+    url='https://github.com/InsectRobotics/pompy',
+    packages=['pompy'],
+    install_requires=['numpy', 'scipy'],
+    classifiers=[
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'License :: OSI Approved :: MIT License',
+        'Topic :: Scientific/Engineering',
+        'Intended Audience :: Science/Research',
+    ],
+    keywords='simulation plume navigation',
+    project_urls={
+        'Documentation': 'https://pompy-docs.readthedocs.io/en/latest/',
+        'Source': 'https://github.com/InsectRobotics/pompy',
+    }
+)
