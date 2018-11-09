@@ -1,0 +1,5 @@
+# Include project description file
+include docs/description.rst
+
+# Include the license file
+include LICENSE
