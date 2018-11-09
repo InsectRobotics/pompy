@@ -2,6 +2,8 @@
 
 [![PyPI version](https://badge.fury.io/py/pompy.svg)](https://badge.fury.io/py/pompy)   
 [![Documentation Status](https://readthedocs.org/projects/pompy-docs/badge/?version=latest)](https://pompy-docs.readthedocs.io/en/latest/?badge=latest)
+[![DOI](https://zenodo.org/badge/46521199.svg)](https://zenodo.org/badge/latestdoi/46521199)
+
 
 PomPy is a NumPy based implementation of the puff-based odour plume model described in 
 
