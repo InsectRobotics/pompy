@@ -1,4 +1,4 @@
-## PomPy - *p*uff-based *o*dour plume *m*odel in *Py*thon
+## PomPy - *P*uff-based *o*dour plume *m*odel in *Py*thon
 
 [![PyPI version](https://badge.fury.io/py/pompy.svg)](https://badge.fury.io/py/pompy)
 [![Documentation Status](https://readthedocs.org/projects/pompy-docs/badge/?version=latest)](https://pompy-docs.readthedocs.io/en/latest/?badge=latest)
@@ -20,7 +20,7 @@ PomPy allows simulation of dynamic 2D odour concentration fields which show some
 
 ### Installation and requirements
 
-PomPy requires a Python 2.7 or newer environment. For usage of the `pompy.models` and `pompy.processors` modules [NumPy](http://www.numpy.org/) and [SciPy](https://scipy.org/scipylib/index.html) are required. For the demonstrations in the `pompy.demos` module [Matplotlib](https://matplotlib.org/) is also required. The [`requirements.txt`](requirements.txt) file lists versions of NumPy, SciPy and Matplotlib known to work with PomPy. A [Jupyter](https://matplotlib.org/) notebook server installation will also be required to run the example notebooks locally.
+PomPy requires a Python 2.7 or newer environment. For usage of the `pompy.models` and `pompy.processors` modules [NumPy](http://www.numpy.org/) and [SciPy](https://scipy.org/scipylib/index.html) are required. For the demonstrations in the `pompy.demos` module [Matplotlib](https://matplotlib.org/) is also required. The [`requirements.txt`](requirements.txt) file lists versions of NumPy, SciPy and Matplotlib known to work with PomPy. A [Jupyter](https://jupyter.org/) notebook server installation will also be required to run the example notebooks locally.
 
 To install the package run
 
